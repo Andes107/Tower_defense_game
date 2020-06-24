@@ -36,35 +36,47 @@ Noted that the some tasks are in a hierarchy structure. No point will be awarded
  ### Game Physics
  
  Regardless how you implement the game, there are some ground rules that need to follow. If your task has violated these physics, penalty may be applied to individual or to the whole group. So please take extra attention to these rules.
- * A tower can only be placed on one grid, not crossing the border. 
- * A monster is modeled as a point which should be roughly the center of its icon/grid. In other words, a monster has a size of 1px by 1px.
- * A monster is always moving from a grid to an adjacent grid either horizontally or vertically.
+ 
+ ##Tower:
+ * A tower can only be placed on one grid, not crossing the border.
  * The game must not allow a player to build a tower if the player does not have enough resource to build it.
- * When a monster is killed it must be removed from the arena, a certain amount of resource will be given to the player.
  * Each grid can contain at most one tower. When it contains a tower, it cannot contain any monster.
- * No tower shall be able to move. 
- * All distance used in the game should be referred as Euclidean distance, in pixels (px). 
- * The width and height of the Arena is 480 px-by-480 px. 
- * All operations by the player must be done by mouse.
+ * No tower shall be able to move.
  * A tower must have at least the following information: attack power, building cost, shooting range. 
  * A tower cannot attack a monster that is outside its shooting range. When we judge a monster is inside a tower's shooting range, the following distance will be used: the Euclidean distance between the center of the grid of where the tower is built and the center of the monster.
- * The health point (HP) of a monster will be deducted by the attack power of the tower attacking it. When HP is less than or equal to zero a monster is killed. 
- * When there are multiple possible monster a tower can shoot (in range), it should always choose a monster that is nearest to up-left corner of the end-zone ((440, 0) in our demo).
+ * When there are multiple possible monster a tower can shoot (in range), it should always choose a monster that is nearest to up-left corner of the end-zone ((440, 0) in our demo). 
  * It is allowed that multiple towers shoot at a monster at the same time even through only one tower is needed to kill it. This is likely to happen. 
 
-#### Rules applies to COMP3111 groups only. 
+###3111H:
+ * After building a tower, all monsters on the map should have at least one valid path move toward the end-zone. Thus, the game must not allow a player to build a tower to trap a monster. 
+ 
+ ##Monster:
+ * A monster is modeled as a point which should be roughly the center of its icon/grid. In other words, a monster has a size of 1px by 1px.
+ * A monster is always moving from a grid to an adjacent grid either horizontally or vertically.
+ * The health point (HP) of a monster will be deducted by the attack power of the tower attacking it. When HP is less than or equal to zero a monster is killed.  
+ * When a monster is killed it must be removed from the arena, a certain amount of resource will be given to the player.
+ 
+###3111H:
+ * A monster will never move toward a grid with a tower. If a monster is already on its way to a new grid and a part of the monster body is already insider the grid, no tower will be allowed to be built on this new grid. 
+ * Each grid can contain any number of monsters as long as it does not contain a tower.
+
+
+##Distance:
+ * All distance used in the game should be referred as Euclidean distance, in pixels (px). 
+ * The width and height of the Arena is 480 px-by-480 px. 
+ 
+ ##Events:
+ * All operations by the player must be done by mouse.
+ ###3111H:  
+* The game is a time-based game. The button `Next Frame` would NOT be tested in grading. It will be served as a debug button for your own interest. There are two methods to start the game: by clicking `Simulate` or `Play`. In either mode monsters will be automatically generated and the monsters will move towards the end-zone, towers will automatically fire if any monsters are in its shooting distance. In `simulate` mode, player is only allowed to build tower before the simulate button is clicked. Once the button is clicked, the player will no be clicking any button until the game is over. In `play` mode, the player is allowed to build or to upgrade tower when the game is running.
+ 
+### Rules applies to COMP3111 groups only. 
  * There are two different colors of grids - green or white. A green grid can only contain a tower. A white grid can only contain monsters. Both kinds of grids may cannot change its color in the middle of the game.
  * A white grid can contain any number of monsters.
  * The game is a turn-based game. In each turn, a player will need to click the button `Next Frame` to run. Then each monster will move certain distance, according to its attributes and status. Each tower may or may not fire, depends on its individual position, attributes, and status etc. In between two clicks of `Next Frame` the player may also allowed to build or destroy towers, whenever resources are enough.
- * When the word `time` is every used in the task description (e.g. 2.iii) , it refers to one *frame* (a click of `Next Frame`) or several frames. 
+ * When the word `time` is every used in the task description (e.g. 2.iii) , it refers to one *frame* (a click of `Next Frame`) or several frames.
 
-
-#### Rules applies to COMP3111-H groups only. 
- * A monster will never move toward a grid with a tower. If a monster is already on its way to a new grid and a part of the monster body is already insider the grid, no tower will be allowed to be built on this new grid. 
- * After building a tower, all monsters on the map should have at least one valid path move toward the end-zone. Thus, the game must not allow a player to build a tower to trap a monster. 
- * Each grid can contain any number of monsters as long as it does not contain a tower.
- * The game is a time-based game. The button `Next Frame` would NOT be tested in grading. It will be served as a debug button for your own interest. There are two methods to start the game: by clicking `Simulate` or `Play`. In either mode monsters will be automatically generated and the monsters will move towards the end-zone, towers will automatically fire if any monsters are in its shooting distance. In `simulate` mode, player is only allowed to build tower before the simulate button is clicked. Once the button is clicked, the player will no be clicking any button until the game is over. In `play` mode, the player is allowed to build or to upgrade tower when the game is running.
- 
+### Rules applies to COMP3111-H groups only.
 ### Tasks (16 points of project Total)
  
 #### Regular Individual-Task - applies to both 3111 and 3111H students
