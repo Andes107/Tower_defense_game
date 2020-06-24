@@ -44,7 +44,7 @@ public class MyController {
     private static final int MAX_H_NUM_GRID = 12;
     private static final int MAX_V_NUM_GRID = 12;
 
-    private Label grids[][] = new Label[MAX_V_NUM_GRID][MAX_H_NUM_GRID]; //the grids on arena
+    private Label grids[][] = new Label[MAX_V_NUM_GRID][MAX_H_NUM_GRID]; //an array of label! god damn it!
     private int x = -1, y = 0; //where is my monster
     /**
      * A dummy function to show how button click works
@@ -78,7 +78,6 @@ public class MyController {
                 grids[i][j] = newLabel;
                 paneArena.getChildren().addAll(newLabel);
             }
-
         setDragAndDrop();
     }
 
