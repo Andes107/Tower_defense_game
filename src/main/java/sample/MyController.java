@@ -12,6 +12,10 @@ import javafx.scene.layout.CornerRadii;
 import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
 
+import Monsters.*;
+import Towers.*;
+import MapObject.*;
+
 public class MyController {
     @FXML
     private Button buttonNextFrame;
@@ -37,6 +41,17 @@ public class MyController {
     @FXML
     private Label labelLaserTower;
 
+    private mapObject[][] map = new mapObject[ARENA_HEIGHT][ARENA_WIDTH];
+
+    public MyController() {
+        for (int i = 0; i < ARENA_HEIGHT; ++i)
+            for (int j = 0; j < ARENA_WIDTH; ++j){
+                map[i][j] = new mapObject();
+                map[i][j].setX(i);
+                map[i][j].setY(j);
+            }
+    }
+
     private static final int ARENA_WIDTH = 480;
     private static final int ARENA_HEIGHT = 480;
     private static final int GRID_WIDTH = 40;
@@ -46,6 +61,7 @@ public class MyController {
 
     private Label grids[][] = new Label[MAX_V_NUM_GRID][MAX_H_NUM_GRID]; //an array of label! god damn it!
     private int x = -1, y = 0; //where is my monster
+
     /**
      * A dummy function to show how button click works
      */
@@ -59,6 +75,7 @@ public class MyController {
      */
     @FXML
     public void createArena() {
+        System.out.println("map.getX(): " + map[0][0].getX());
         if (grids[0][0] != null)
             return; //created already
         for (int i = 0; i < MAX_V_NUM_GRID; i++)
@@ -109,7 +126,7 @@ public class MyController {
 
         //well, you can also write anonymous class or even lambda
         //Anonymous class
-        target.setOnDragOver(new EventHandler <DragEvent>() {
+        target.setOnDragOver(new EventHandler<DragEvent>() {
             public void handle(DragEvent event) {
                 /* data is dragged over the target */
                 System.out.println("onDragOver");
@@ -126,7 +143,7 @@ public class MyController {
             }
         });
 
-        target.setOnDragEntered(new EventHandler <DragEvent>() {
+        target.setOnDragEntered(new EventHandler<DragEvent>() {
             public void handle(DragEvent event) {
                 /* the drag-and-drop gesture entered the target */
                 System.out.println("onDragEntered");
@@ -141,10 +158,10 @@ public class MyController {
         });
         //lambda
         target.setOnDragExited((event) -> {
-                /* mouse moved away, remove the graphical cues */
-                target.setStyle("-fx-border-color: black;");
-                System.out.println("Exit");
-                event.consume();
+            /* mouse moved away, remove the graphical cues */
+            target.setStyle("-fx-border-color: black;");
+            System.out.println("Exit");
+            event.consume();
         });
     }
 }
