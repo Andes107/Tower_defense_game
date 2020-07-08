@@ -3,23 +3,23 @@ package Monsters;
 import MapObject.*;
 import java.util.PriorityQueue;
 
-public abstract class Monster {
+public class Monster {
     public static final int ARENA_SIZE = 480;
 
     public int health; //can be negative since it will then be removed
     public int speed;
+    public int counter;
     public int x; //current position
     public int y; //current position
     public mapObject next; //this is a linked list where next stores next step's information plus what's next
     /*
-     * penguin and unicorn's next will hold aNode
-     * fox next will hode dNode
-     * penguins and unicorns use 1 algorithm for updating next based on current map
-     * fox use another algorithm for updating next based on current map
-     * so the question is: should i declare monster abstract or override it in fox?
-     * override in fox then
+     * Ok, now I have implemented the algorithom for penguin and unicorn
+     * next step i should implement for fox
+     * now for fox it's basically another dikastra, which is also A* but all heuristic 0
+     * that's it
      * */
 
+/*
     public Monster(int health, int speed, int x, int y, mapObject next) {
         this.health = health;
         this.speed = speed;
@@ -27,6 +27,7 @@ public abstract class Monster {
         this.y = y;
         this.next = next;
     }
+*/
 
     public void nextAlgorithm(mapObject[][] map) {
         aNode[][] aNodeMap = newANodeMap(map); //1. create a new aNodeMap
@@ -71,16 +72,18 @@ public abstract class Monster {
         int index = 0;
         if (x + 1 < ARENA_SIZE && aNodeMap[x+1][y].monster == null && aNodeMap[x+1][y].tower == null)
             neighbour[index++] = aNodeMap[x + 1][y];
-        if (y + 1 < ARENA_SIZE && aNodeMap[x+1][y].monster == null && aNodeMap[x][y+1].tower == null)
+        if (y + 1 < ARENA_SIZE && aNodeMap[x][y+1].monster == null && aNodeMap[x][y+1].tower == null)
             neighbour[index++] = aNodeMap[x][y + 1];
-        if (x - 1 >= 0 && aNodeMap[x+1][y].monster == null && aNodeMap[x-1][y].tower == null)
+        if (x - 1 >= 0 && aNodeMap[x-1][y].monster == null && aNodeMap[x-1][y].tower == null)
             neighbour[index++] = aNodeMap[x - 1][y + 1];
-        if (y - 1 >= 0 && aNodeMap[x+1][y].monster == null && aNodeMap[x][y-1].tower == null)
+        if (y - 1 >= 0 && aNodeMap[x][y-1].monster == null && aNodeMap[x][y-1].tower == null)
             neighbour[index++] = aNodeMap[x][y - 1];
         return neighbour;
     }
 
     public void processNeighbour(aNode current, aNode neighbour, PriorityQueue<aNode> pq) {
+        if (neighbour == null)
+            return;
         if (current.g + 1 < neighbour.g && neighbour.status != 2) {
             neighbour.g = current.g + 1;
             neighbour.f = neighbour.g + neighbour.h;

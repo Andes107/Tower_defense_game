@@ -16,7 +16,7 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 600, 480));
         primaryStage.show();
         MyController appController = (MyController)loader.getController();
-        appController.createArena();
+//        appController.createArena();
     }
 
 

@@ -2,6 +2,8 @@ package MapObject;
 
 import Monsters.*;
 import Towers.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class mapObject { //seems at the end it will be bottom to top
@@ -10,16 +12,15 @@ public class mapObject { //seems at the end it will be bottom to top
     public int y;
     public Monster monster; //There will only be 1 monster
     public Tower tower; //There will only be 1 tower
-    public List<Tower> towerList; //A list of towers that can influence this region
+    public List<Tower> towerList = new ArrayList<Tower>(); //A list of towers that can influence this region
 
     public mapObject prev; //for algorithm
     public mapObject next; //for algorithm
 
     public mapObject() {}
-    public mapObject(int x, int y, List<Tower> towerList, Monster monster){
+    public mapObject(int x, int y, Monster monster){
         this.x = x;
         this.y = y;
-        this.towerList = towerList;
         this.monster = monster;
     }
 }

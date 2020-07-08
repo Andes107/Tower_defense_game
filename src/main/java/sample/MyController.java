@@ -43,14 +43,14 @@ public class MyController {
 
     private mapObject[][] map = new mapObject[ARENA_HEIGHT][ARENA_WIDTH];
 
-    public MyController() {
+    /*public MyController() {
         for (int i = 0; i < ARENA_HEIGHT; ++i)
             for (int j = 0; j < ARENA_WIDTH; ++j){
                 map[i][j] = new mapObject();
                 map[i][j].setX(i);
                 map[i][j].setY(j);
             }
-    }
+    }*/
 
     private static final int ARENA_WIDTH = 480;
     private static final int ARENA_HEIGHT = 480;
@@ -75,7 +75,6 @@ public class MyController {
      */
     @FXML
     public void createArena() {
-        System.out.println("map.getX(): " + map[0][0].getX());
         if (grids[0][0] != null)
             return; //created already
         for (int i = 0; i < MAX_V_NUM_GRID; i++)
