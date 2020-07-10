@@ -4,39 +4,31 @@ import MapObject.*;
 import java.util.PriorityQueue;
 
 public class Monster {
-    public static final int ARENA_SIZE = 480;
-
-    public int health; //can be negative since it will then be removed
-    public int speed;
-    public int counter;
+    public static final int ARENA_SIZE = 5;
     public int x; //current position
     public int y; //current position
     public mapObject next; //this is a linked list where next stores next step's information plus what's next
-    /*
-     * Ok, now I have implemented the algorithom for penguin and unicorn
-     * next step i should implement for fox
-     * now for fox it's basically another dikastra, which is also A* but all heuristic 0
-     * that's it
-     * */
 
-/*
-    public Monster(int health, int speed, int x, int y, mapObject next) {
-        this.health = health;
-        this.speed = speed;
+    public Monster() {
+
+    }
+
+    public Monster (int x, int y, mapObject next) {
         this.x = x;
         this.y = y;
         this.next = next;
     }
-*/
 
     public void nextAlgorithm(mapObject[][] map) {
         aNode[][] aNodeMap = newANodeMap(map); //1. create a new aNodeMap
 
         PriorityQueue<aNode> pq = newPriorityMap(aNodeMap[this.x][this.y]); //2. create a new priority queue with starting point added
-        aNode current;
+        System.out.println("this.x: " + this.x + " this.y " + this.y);
+        aNode current = new aNode();
 
         while (pq.isEmpty() == false) {
             current = pq.poll();
+            System.out.println("(x,y)" + current.x + " , " + current.y);
             if (endPointReached(current.x, current.y)) //3. Is the end point reached?
                 break;
             aNode[] neighbours = findNeighbour(current.x, current.y, aNodeMap); //4. The end point isn't reached, find me the neigbours
@@ -75,7 +67,7 @@ public class Monster {
         if (y + 1 < ARENA_SIZE && aNodeMap[x][y+1].monster == null && aNodeMap[x][y+1].tower == null)
             neighbour[index++] = aNodeMap[x][y + 1];
         if (x - 1 >= 0 && aNodeMap[x-1][y].monster == null && aNodeMap[x-1][y].tower == null)
-            neighbour[index++] = aNodeMap[x - 1][y + 1];
+            neighbour[index++] = aNodeMap[x - 1][y];
         if (y - 1 >= 0 && aNodeMap[x][y-1].monster == null && aNodeMap[x][y-1].tower == null)
             neighbour[index++] = aNodeMap[x][y - 1];
         return neighbour;
@@ -96,9 +88,13 @@ public class Monster {
     }
 
     public mapObject updateNext(mapObject endPoint, int start_x, int start_y) {
-        mapObject current = endPoint;
-        for (; current.x != start_x && current.y != start_y && current != null; current = current.prev)
-            current.prev.next = current;
-        return current.next;
+        if (endPoint.prev == null)
+            return null;
+        do {
+            endPoint.prev.next = endPoint;
+            endPoint = endPoint.prev;
+        } while (endPoint.x != start_x || endPoint.y != start_y);
+        System.out.println("endPoint.next.x: " + endPoint.next.x + " endPoint.next.y: " + endPoint.next.y);
+        return endPoint.next;
     }
 }

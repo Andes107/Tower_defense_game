@@ -10,68 +10,83 @@ import java.util.PriorityQueue;
 import static org.junit.Assert.*;
 
 public class MonsterTest {
-    private static final int ARENA_SIZE = 480;
-    private static mapObject[][] testMap;
-    private static aNode[][] aNodeTestMap;
-    private static Monster testMonster;
+    private final int ARENA_SIZE = 5;
+    private Monster testMonster;
+    private mapObject[][] testMap;
+    private aNode[][] aNodeTestMap;
+    private PriorityQueue<aNode> pq;
 
-    @BeforeClass
-    public static void setUp() {
+    public void mapMonsterSetUp() {
         testMap = new mapObject[ARENA_SIZE][ARENA_SIZE];
         for (int i = 0; i < ARENA_SIZE; ++i)
             for (int j = 0; j < ARENA_SIZE; ++j) {
-                testMap[i][j] = new mapObject(i,j,null);
+                testMap[i][j] = new mapObject(i, j, null, null, null, null);
             }
-        testMonster = new Monster();
+        testMonster = new Monster(0,0,null);
+        testMap[0][0].monster = testMonster;
+    }
+
+    @Ignore
+    @Test
+    public void testNewANodeMap() { //check the function for producing anodes, also initialize the anodetestmap
+        mapMonsterSetUp();
         aNodeTestMap = testMonster.newANodeMap(testMap);
-        aNodeTestMap[4][4].monster = testMonster;
-    }
-
-    @Ignore
-    @Test
-    public void checkTestMap() {
-        for (int i = 0; i < ARENA_SIZE; ++i)
+        for (int i = 0; i < ARENA_SIZE ; ++i)
             for (int j = 0; j < ARENA_SIZE; ++j){
-                assertEquals(i,testMap[i][j].x);
-                assertEquals(j,testMap[i][j].y);
+                assertEquals(i, aNodeTestMap[i][j].x);
+                assertEquals(j, aNodeTestMap[i][j].y);
+                assertNull(aNodeTestMap[i][j].tower);
+                assertEquals((ARENA_SIZE-1-i)*(ARENA_SIZE-1-i) + (ARENA_SIZE-1-j)*(ARENA_SIZE-1-j), aNodeTestMap[i][j].h);
+                assertEquals(ARENA_SIZE * ARENA_SIZE, aNodeTestMap[i][j].g);
             }
     }
 
     @Ignore
     @Test
-    public void checknewANodeMap() { //check function
-        for (int i = 0; i < ARENA_SIZE; ++i)
-            for (int j = 0; j < ARENA_SIZE; ++j){
-                assertEquals(i,aNodeTestMap[i][j].x);
-                assertEquals(j,aNodeTestMap[i][j].y);
-                assertEquals(null, aNodeTestMap[i][j].next);
-                assertEquals((int)Math.floor(Math.sqrt(i*i + j*j)),(int)Math.floor(aNodeTestMap[i][j].h));
-                assertEquals(ARENA_SIZE, (int)aNodeTestMap[i][j].g);
+    public void testNewPriorityMap() { //check initialization of priority, also initialize the priority
+        mapMonsterSetUp();
+        aNodeTestMap = testMonster.newANodeMap(testMap);
+        pq = testMonster.newPriorityMap(aNodeTestMap[testMonster.x][testMonster.y]);
+        assertEquals(1,pq.size());
+        aNode node = pq.poll();
+        assertEquals(testMonster.x,node.x);
+        assertEquals(testMonster.y,node.y);
+        assertEquals((ARENA_SIZE-testMonster.x)*(ARENA_SIZE-testMonster.x) + (ARENA_SIZE-testMonster.y)*(ARENA_SIZE-testMonster.y),node.h);
+        assertEquals(0, node.g);
+        assertEquals((ARENA_SIZE-testMonster.x)*(ARENA_SIZE-testMonster.x) + (ARENA_SIZE-testMonster.y)*(ARENA_SIZE-testMonster.y), node.f);
+    }
+
+    @Ignore
+    @Test
+    public void testEndPointReached() {
+        mapMonsterSetUp();
+        assertEquals(false, testMonster.endPointReached(testMonster.x,testMonster.y));
+        assertEquals(true,testMonster.endPointReached(ARENA_SIZE- 1,ARENA_SIZE -1));
+    }
+
+    @Ignore
+    @Test
+    public void testFindNeighbours() {
+        testNewANodeMap();
+        aNode[] neighbours = testMonster.findNeighbour(ARENA_SIZE-1,ARENA_SIZE-1,aNodeTestMap);
+        assertNotNull(neighbours[0]);
+        assertNotNull(neighbours[1]);
+        for (int i = 2; i < 4; ++i)
+            assertNull(neighbours[i]);
+    }
+
+    @Test
+    public void testNextAlgorithm() {
+        testNewANodeMap();
+        for (int i = 0; i < ARENA_SIZE; ++i) {
+            for (int j = 0; j < ARENA_SIZE; ++j) {
+                System.out.print(aNodeTestMap[i][j].h + " ");
             }
-        assertNotNull(aNodeTestMap[4][4].monster);
-    }
-
-    @Ignore
-    @Test
-    public void checkFindNeighbour() { //check function
-        aNode[] neighbours = testMonster.findNeighbour(3,4,aNodeTestMap);
-        assertNull(neighbours[3]);
-//        Assume.assumeTrue(aNodeTestMap[3][4].monster != null); if the condition is true, then test case runs, otherwise ignore
-    }
-
-    @Ignore
-    @Test(expected = Test.None.class)
-    public void checkProcessNeighbour() { //check function
-        PriorityQueue<aNode> pq = testMonster.newPriorityMap(aNodeTestMap[0][0]);
-        assertEquals(0,(int)aNodeTestMap[0][0].g);
-        testMonster.processNeighbour(aNodeTestMap[0][0],aNodeTestMap[1][0],pq);
-        assertNotNull(aNodeTestMap[1][0].prev);
-    }
-
-//    @Ignore
-    @Test
-    public void testAlgorithm() { //check function
+            System.out.println();
+        }
         testMonster.nextAlgorithm(testMap);
         assertNotNull(testMonster.next);
+        assertEquals(0,testMonster.x);
+        assertEquals(0,testMonster.y);
     }
 }
