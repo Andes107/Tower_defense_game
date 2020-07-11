@@ -7,13 +7,13 @@ public class Monster {
     public static final int ARENA_SIZE = 5;
     public int x; //current position
     public int y; //current position
-    public mapObject next; //this is a linked list where next stores next step's information plus what's next
+    public aNode next; //this is a linked list where next stores next step's information plus what's next
 
     public Monster() {
 
     }
 
-    public Monster (int x, int y, mapObject next) {
+    public Monster (int x, int y, aNode next) {
         this.x = x;
         this.y = y;
         this.next = next;
@@ -23,12 +23,10 @@ public class Monster {
         aNode[][] aNodeMap = newANodeMap(map); //1. create a new aNodeMap
 
         PriorityQueue<aNode> pq = newPriorityMap(aNodeMap[this.x][this.y]); //2. create a new priority queue with starting point added
-        System.out.println("this.x: " + this.x + " this.y " + this.y);
-        aNode current = new aNode();
+        aNode current;
 
         while (pq.isEmpty() == false) {
             current = pq.poll();
-            System.out.println("(x,y)" + current.x + " , " + current.y);
             if (endPointReached(current.x, current.y)) //3. Is the end point reached?
                 break;
             aNode[] neighbours = findNeighbour(current.x, current.y, aNodeMap); //4. The end point isn't reached, find me the neigbours
@@ -87,14 +85,13 @@ public class Monster {
         }
     }
 
-    public mapObject updateNext(mapObject endPoint, int start_x, int start_y) {
+    public aNode updateNext(aNode endPoint, int start_x, int start_y) {
         if (endPoint.prev == null)
             return null;
         do {
             endPoint.prev.next = endPoint;
             endPoint = endPoint.prev;
         } while (endPoint.x != start_x || endPoint.y != start_y);
-        System.out.println("endPoint.next.x: " + endPoint.next.x + " endPoint.next.y: " + endPoint.next.y);
         return endPoint.next;
     }
 }

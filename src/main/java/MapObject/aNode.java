@@ -6,12 +6,15 @@ public class aNode extends mapObject implements Comparable<aNode>{
     public int h; //heuristic cost, which is a minimal estimate
     public int f; //f = g + h
 
+    public aNode prev; //for algorithm
+    public aNode next; //for algorithm
+
     public aNode() {
 
     }
 
     public aNode(mapObject anMapObject) {
-        super(anMapObject.x, anMapObject.y,anMapObject.monster, anMapObject.tower, anMapObject.prev, anMapObject.next);//so this copies what is needed
+        super(anMapObject.x, anMapObject.y,anMapObject.monster, anMapObject.tower);//so this copies what is needed
         this.status = 0; //it is of fucking course not discovered
         this.h = (ARENA_SIZE-1-super.x)*(ARENA_SIZE-1-super.x) + (ARENA_SIZE-1-super.y)*(ARENA_SIZE-1-super.y);
         this.g = ARENA_SIZE * ARENA_SIZE;

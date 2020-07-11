@@ -1,6 +1,7 @@
 package Monsters;
 
 import MapObject.*;
+import Towers.Tower;
 import org.apache.commons.lang3.ObjectUtils;
 import org.junit.Assume;
 import org.junit.*;
@@ -20,10 +21,11 @@ public class MonsterTest {
         testMap = new mapObject[ARENA_SIZE][ARENA_SIZE];
         for (int i = 0; i < ARENA_SIZE; ++i)
             for (int j = 0; j < ARENA_SIZE; ++j) {
-                testMap[i][j] = new mapObject(i, j, null, null, null, null);
+                testMap[i][j] = new mapObject(i, j, null, null);
             }
         testMonster = new Monster(0,0,null);
         testMap[0][0].monster = testMonster;
+        testMap[ARENA_SIZE-1][ARENA_SIZE-1].tower = new Tower();
     }
 
     @Ignore
@@ -35,7 +37,7 @@ public class MonsterTest {
             for (int j = 0; j < ARENA_SIZE; ++j){
                 assertEquals(i, aNodeTestMap[i][j].x);
                 assertEquals(j, aNodeTestMap[i][j].y);
-                assertNull(aNodeTestMap[i][j].tower);
+//                assertNull(aNodeTestMap[i][j].tower);
                 assertEquals((ARENA_SIZE-1-i)*(ARENA_SIZE-1-i) + (ARENA_SIZE-1-j)*(ARENA_SIZE-1-j), aNodeTestMap[i][j].h);
                 assertEquals(ARENA_SIZE * ARENA_SIZE, aNodeTestMap[i][j].g);
             }
@@ -85,8 +87,13 @@ public class MonsterTest {
             System.out.println();
         }
         testMonster.nextAlgorithm(testMap);
-        assertNotNull(testMonster.next);
-        assertEquals(0,testMonster.x);
-        assertEquals(0,testMonster.y);
+        assertNull(testMonster.next);
+        aNode current = testMonster.next;
+        if (current == null)
+            System.out.println("Well, you can't reach it");
+        while (current != null) {
+            System.out.print("(" + current.x + ", " + current.y + ") ");
+            current = current.next;
+        }
     }
 }
