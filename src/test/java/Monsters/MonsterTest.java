@@ -25,14 +25,16 @@ public class MonsterTest {
             }
         testMonster = new Monster(0,0,null);
         testMap[0][0].monster = testMonster;
-        testMap[ARENA_SIZE-1][ARENA_SIZE-1].tower = new Tower();
+        testMap[1][1].tower = new Tower();
+        testMap[2][2].tower = new Tower();
+        testMap[3][3].monster = new Monster();
     }
 
     @Ignore
     @Test
     public void testNewANodeMap() { //check the function for producing anodes, also initialize the anodetestmap
         mapMonsterSetUp();
-        aNodeTestMap = testMonster.newANodeMap(testMap);
+        aNodeTestMap = testMonster.newANodeMap(testMap, false);
         for (int i = 0; i < ARENA_SIZE ; ++i)
             for (int j = 0; j < ARENA_SIZE; ++j){
                 assertEquals(i, aNodeTestMap[i][j].x);
@@ -47,8 +49,8 @@ public class MonsterTest {
     @Test
     public void testNewPriorityMap() { //check initialization of priority, also initialize the priority
         mapMonsterSetUp();
-        aNodeTestMap = testMonster.newANodeMap(testMap);
-        pq = testMonster.newPriorityMap(aNodeTestMap[testMonster.x][testMonster.y]);
+        aNodeTestMap = testMonster.newANodeMap(testMap, false);
+        pq = testMonster.newPriorityMap(aNodeTestMap[testMonster.x][testMonster.y], false);
         assertEquals(1,pq.size());
         aNode node = pq.poll();
         assertEquals(testMonster.x,node.x);
@@ -77,17 +79,18 @@ public class MonsterTest {
             assertNull(neighbours[i]);
     }
 
+    @Ignore
     @Test
     public void testNextAlgorithm() {
         testNewANodeMap();
         for (int i = 0; i < ARENA_SIZE; ++i) {
             for (int j = 0; j < ARENA_SIZE; ++j) {
-                System.out.print(aNodeTestMap[i][j].h + " ");
+                System.out.print((aNodeTestMap[i][j].tower != null || aNodeTestMap[i][j].monster != null ) + " ");
             }
             System.out.println();
         }
-        testMonster.nextAlgorithm(testMap);
-        assertNull(testMonster.next);
+        testMonster.nextAlgorithm(testMap, false);
+        assertNotNull(testMonster.next);
         aNode current = testMonster.next;
         if (current == null)
             System.out.println("Well, you can't reach it");
