@@ -1,7 +1,16 @@
 package sample;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.event.*;
 import javafx.fxml.FXML;
@@ -15,6 +24,11 @@ import javafx.scene.paint.Color;
 import Monsters.*;
 import Towers.*;
 import MapObject.*;
+import javafx.util.Duration;
+
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MyController {
     @FXML
@@ -43,15 +57,6 @@ public class MyController {
 
     private mapObject[][] map = new mapObject[ARENA_HEIGHT][ARENA_WIDTH];
 
-    /*public MyController() {
-        for (int i = 0; i < ARENA_HEIGHT; ++i)
-            for (int j = 0; j < ARENA_WIDTH; ++j){
-                map[i][j] = new mapObject();
-                map[i][j].setX(i);
-                map[i][j].setY(j);
-            }
-    }*/
-
     private static final int ARENA_WIDTH = 480;
     private static final int ARENA_HEIGHT = 480;
     private static final int GRID_WIDTH = 40;
@@ -61,14 +66,44 @@ public class MyController {
 
     private Label grids[][] = new Label[MAX_V_NUM_GRID][MAX_H_NUM_GRID]; //an array of label! god damn it!
     private int x = -1, y = 0; //where is my monster
+    private newFox subject1;
+//First job, put photos on monster
+//Second job, show resource on screen plus on drag for towers
+//This is will be today's job
 
     /**
      * A dummy function to show how button click works
      */
     @FXML
     private void play() {
-        System.out.println("Play button clicked");
+        subject1 = new newFox();
+        ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/fox.png")));
+        imageView.setFitHeight(20);
+        imageView.setFitWidth(20);
+        subject1.setX(new Random().nextInt(ARENA_HEIGHT));
+        imageView.xProperty().bind(subject1.xProperty());
+        imageView.yProperty().bind(subject1.xProperty());
+        paneArena.getChildren().add(imageView);
+
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(5), ev -> {
+            subject1.setX(new Random().nextInt(ARENA_HEIGHT));
+        }));
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
     }
+
+    class newFox {
+        private IntegerProperty x = new SimpleIntegerProperty();
+
+        public IntegerProperty xProperty() {
+            return x;
+        }
+
+        public void setX(int x) {
+            this.x.set(x);
+        }
+    }
+
 
     /**
      * A function that create the Arena

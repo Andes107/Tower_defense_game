@@ -5,6 +5,7 @@ import java.util.PriorityQueue;
 
 public class Monster {
     public static final int ARENA_SIZE = 5;
+
     public int x; //current position
     public int y; //current position
     public aNode next; //this is a linked list where next stores next step's information plus what's next
