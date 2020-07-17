@@ -9,6 +9,9 @@ public class Monster {
     public int x; //current position
     public int y; //current position
     public aNode next; //this is a linked list where next stores next step's information plus what's next
+    public int speed; //the monster will move after speed amount of game loops, adjust per difficulty
+    public int counter; //counter means how many game loops left until next move
+    public int health; //may reduce per game loop, may be negative, adjust per difficulty
 
     public Monster() {
 
