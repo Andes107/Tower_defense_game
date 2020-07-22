@@ -67,7 +67,7 @@ public class FoxTest {
         assertEquals(testMonster.y,node.y);
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testNextAlgorithm() {
         testNewANodeMap();

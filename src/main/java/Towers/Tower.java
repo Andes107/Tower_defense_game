@@ -6,8 +6,8 @@ import Monsters.Monster;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public abstract class Tower {
-    public static final int ARENA_SIZE = 5;
+public class Tower {
+    public static final int ARENA_SIZE = 25;
 
     public int damage = 5;
     public int bump;
@@ -31,32 +31,44 @@ public abstract class Tower {
     }
 
     public void markChordKillZone(int x, int y, int dx, int dy, mapObject[][] map, Tower target) {
-        if (y + dy < ARENA_SIZE) {
-            if (x + dx < ARENA_SIZE)
+        if (map == null)
+            throw new NullPointerException();
+        if (target == null)
+            throw new NullPointerException();
+        if (y + dy < ARENA_SIZE && y + dy >= 0) {
+            if (x + dx < ARENA_SIZE && x + dx >= 0)
                 map[x+dx][y+dy].towers.add(target);
-            if (x - dx >= 0)
+            if (x - dx >= 0 && x - dx < ARENA_SIZE)
                 map[x-dx][y+dy].towers.add(target);
         }
-        if (y - dy >= 0) {
-            if (x + dx < ARENA_SIZE)
+        if (y - dy >= 0 && y - dy < ARENA_SIZE) {
+            if (x + dx < ARENA_SIZE && x + dx >= 0)
                 map[x+dx][y-dy].towers.add(target);
-            if (x - dx >= 0)
+            if (x - dx >= 0 && x - dx < ARENA_SIZE)
                 map[x-dx][y-dy].towers.add(target);
         }
     }
 
     public void markRadiusKillZone(int x, int y, int di, mapObject[][] map, Tower target) {
-        if (y + di < ARENA_SIZE)
+        if (map == null) {
+            System.out.println("Issue: null map; Method: markChordKillZone; Class: Tower");
+            throw new NullPointerException();
+        }
+        if (target == null) {
+            System.out.println("Issue: null target; Method: markChordKillZone; Class: Tower");
+            throw new NullPointerException();
+        }
+        if (y + di < ARENA_SIZE && y + di >= 0 && x >= 0 && x < ARENA_SIZE)
             map[x][y+di].towers.add(target);
-        if (y - di >= 0)
+        if (y - di >= 0 && y - di < ARENA_SIZE && x >= 0 && x < ARENA_SIZE)
             map[x][y-di].towers.add(target);
-        if (x + di < ARENA_SIZE)
+        if (x + di < ARENA_SIZE && x + di >= 0 && y >= 0 && y < ARENA_SIZE)
             map[x+di][y].towers.add(target);
-        if (x- di >= 0)
+        if (x- di >= 0&& x - di < ARENA_SIZE && y >= 0 && y < ARENA_SIZE)
             map[x-di][y].towers.add(target);
     }
 
-    public abstract void inflictDamage(mapObject[][] map);
+    public void inflictDamage(mapObject[][] map){};
 
     public Monster findChordVictim(int x, int y, int dx, int dy, mapObject[][] map, int minDistance) {
         Monster victim = null;
