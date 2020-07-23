@@ -2,6 +2,7 @@ package Towers;
 
 import MapObject.*;
 
+import Monsters.Monster;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -13,6 +14,7 @@ public class TowerTest {
      * */
     private static final int ARENA_SIZE = Tower.ARENA_SIZE;
 
+    @Ignore
     @Test(expected = Exception.class)
     public void testMarkChordKillZone() {
         mapObject[][] map = new mapObject[ARENA_SIZE][ARENA_SIZE]; //Purpose: check
@@ -42,6 +44,7 @@ public class TowerTest {
         //ok, so no bugs for incorrect input
     }
 
+    @Ignore
     @Test(expected = Exception.class)
     public void testMarkRadiusKillZone() {
         //Initialize map object
@@ -73,74 +76,160 @@ public class TowerTest {
         //ok, so no bugs for incorrect input
     }
 
-    @Test(expected = Exception.class)
-    public void testBasicConstructor() {
+//    @Ignore
+    @Test
+    public void rightBasicConstructor() {
+        int r1 = 5;
         mapObject[][] map = new mapObject[ARENA_SIZE][ARENA_SIZE]; //Purpose: check
         for (int i = 0; i < ARENA_SIZE; ++i)
             for (int j = 0; j < ARENA_SIZE; ++j)
                 map[i][j] = new mapObject(i, j, null, null);
-        Tower center = new Basic(ARENA_SIZE / 2, ARENA_SIZE / 2, map);
-/*
-        for (int i = 0; i < ARENA_SIZE; ++i) {
-            for (int j = 0; j < ARENA_SIZE; ++j)
-                System.out.print(map[i][j].towers.size() + " ");
-        System.out.println();
-        }
- */
-        Tower topLeft = new Basic(0, 0, map);
-        Tower topRight = new Basic(0, ARENA_SIZE - 1, map);
-        Tower bottomLeft = new Basic(ARENA_SIZE - 1, 0, map);
-        Tower bottomRight = new Basic(ARENA_SIZE - 1, ARENA_SIZE-1,map);
-        /*incorrect input now*/
-        Tower negative = new Basic(-1,-1,map);
-        Tower nullMap = new Basic(ARENA_SIZE/2, ARENA_SIZE/2, null);
-    }
-
-    @Test(expected = Exception.class)
-    public void testIceConstructor() {
-        mapObject[][] map = new mapObject[ARENA_SIZE][ARENA_SIZE]; //Purpose: check
-        for (int i = 0; i < ARENA_SIZE; ++i)
-            for (int j = 0; j < ARENA_SIZE; ++j)
-                map[i][j] = new mapObject(i, j, null, null);
-        Tower center = new Ice(ARENA_SIZE / 2, ARENA_SIZE / 2, map);
-
-        Tower topLeft = new Ice(0, 0, map);
-
-        Tower topRight = new Ice(0, ARENA_SIZE - 1, map);
-        Tower bottomLeft = new Ice(ARENA_SIZE - 1, 0, map);
-        Tower bottomRight = new Ice(ARENA_SIZE - 1, ARENA_SIZE-1,map);
-/*
-        for (int i = 0; i < ARENA_SIZE; ++i) {
+        Tower center = new Basic(ARENA_SIZE / 2, ARENA_SIZE / 2, r1, map);
+/*        for (int i = 0; i < ARENA_SIZE; ++i) {
             for (int j = 0; j < ARENA_SIZE; ++j)
                 System.out.print(map[i][j].towers.size() + " ");
             System.out.println();
-        }
-*/
-        /*incorrect input now*/
-        Tower negative = new Ice(-1,-1,map);
-        Tower nullMap = new Ice(ARENA_SIZE/2, ARENA_SIZE/2, null);
+        }*/
+        Tower topLeft = new Basic(0, 0, r1, map);
+
+        Tower topRight = new Basic(0, ARENA_SIZE - 1,r1,  map);
+
+        Tower bottomLeft = new Basic(ARENA_SIZE - 1, 0, r1, map);
+        Tower bottomRight = new Basic(ARENA_SIZE - 1, ARENA_SIZE-1, r1,map);
+
+
     }
 
+//    @Ignore
     @Test(expected = Exception.class)
-    public void testCatapultConstructor() {
+    public void wrongBasicConstructor() {
+        int r1 = 5;
         mapObject[][] map = new mapObject[ARENA_SIZE][ARENA_SIZE]; //Purpose: check
         for (int i = 0; i < ARENA_SIZE; ++i)
             for (int j = 0; j < ARENA_SIZE; ++j)
                 map[i][j] = new mapObject(i, j, null, null);
-        Tower center = new Catapult(ARENA_SIZE / 2, ARENA_SIZE / 2, map);
+        Tower negative = new Basic(-1,-1,r1, map);
+        Tower nullMap = new Basic(ARENA_SIZE/2, ARENA_SIZE/2,r1, null);
+        Tower negativeR1 = new Basic(ARENA_SIZE/2, ARENA_SIZE/2, -1, map);
+    }
 
-        Tower topLeft = new Catapult(0, 0, map);
-        for (int i = 0; i < ARENA_SIZE; ++i) {
+    @Test
+    public void rightBasicInflictDamage() {
+        int r1 = 5;
+        int health = 15;
+        mapObject[][] map = new mapObject[ARENA_SIZE][ARENA_SIZE]; //Purpose: check
+        for (int i = 0; i < ARENA_SIZE; ++i)
+            for (int j = 0; j < ARENA_SIZE; ++j)
+                map[i][j] = new mapObject(i, j, new Monster(i,j,null, health), null);
+        Tower center = new Basic(ARENA_SIZE/2, ARENA_SIZE/2, r1, map);
+        center.inflictDamage(map);
+        Tower topLeft = new Basic(0,0,r1,map);
+        topLeft.inflictDamage(map);
+
+        mapObject[][] oneMonsterMap = new mapObject[ARENA_SIZE][ARENA_SIZE];
+
+
+        for (int i = 0; i < ARENA_SIZE; ++i)
+            for (int j = 0; j < ARENA_SIZE; ++j)
+                oneMonsterMap[i][j] = new mapObject(i, j, null, null);
+        oneMonsterMap[0][0].monster = new Monster(0, 0, null, health);
+        Tower centerForOneMonster = new Basic(ARENA_SIZE/2, ARENA_SIZE/2, r1, oneMonsterMap);
+
+        centerForOneMonster.inflictDamage(oneMonsterMap);
+/*        for (int i = 0; i < ARENA_SIZE; ++i) {
+            for (int j = 0; j < ARENA_SIZE; ++j) {
+                if ((ARENA_SIZE/2 - i) * (ARENA_SIZE/2 - i) + (ARENA_SIZE/2 - j) * (ARENA_SIZE/2 - j) <= r1 *r1 && oneMonsterMap[i][j].monster != null)
+                    System.out.print(oneMonsterMap[i][j].monster.health + ",1 " );
+                else
+                    System.out.print("=====");
+            }
+            System.out.println();
+        }*/
+
+    }
+
+    @Test
+    public void wrongBasicInflictDamage() {
+        mapObject[][] badMap = new mapObject[ARENA_SIZE][ARENA_SIZE];
+        mapObject[][] goodMap = new mapObject[ARENA_SIZE][ARENA_SIZE];
+        for (int i = 0; i < ARENA_SIZE; ++i)
+            for (int j = 0; j < ARENA_SIZE; ++j)
+                goodMap[i][j] = new mapObject(i, j, null, null);
+        int r1 = 5;
+        Tower random = new Basic(ARENA_SIZE/2, ARENA_SIZE/2, r1, goodMap);
+        random.inflictDamage(badMap);
+    }
+
+//    @Ignore
+    @Test
+    public void rightIceConstructor() {
+        int r1 = 10;
+        mapObject[][] map = new mapObject[ARENA_SIZE][ARENA_SIZE]; //Purpose: check
+        for (int i = 0; i < ARENA_SIZE; ++i)
+            for (int j = 0; j < ARENA_SIZE; ++j)
+                map[i][j] = new mapObject(i, j, null, null);
+        Tower center = new Ice(ARENA_SIZE / 2, ARENA_SIZE / 2,r1,  map);
+
+        Tower topLeft = new Ice(0, 0,r1,  map);
+/*        for (int i = 0; i < ARENA_SIZE; ++i) {
             for (int j = 0; j < ARENA_SIZE; ++j)
                 System.out.print(map[i][j].towers.size() + " ");
             System.out.println();
-        }
-        Tower topRight = new Catapult(0, ARENA_SIZE - 1, map);
-        Tower bottomLeft = new Catapult(ARENA_SIZE - 1, 0, map);
-        Tower bottomRight = new Catapult(ARENA_SIZE - 1, ARENA_SIZE-1,map);
+        }*/
+        Tower topRight = new Ice(0, ARENA_SIZE - 1, r1, map);
+        Tower bottomLeft = new Ice(ARENA_SIZE - 1, 0, r1, map);
+        Tower bottomRight = new Ice(ARENA_SIZE - 1, ARENA_SIZE-1, r1,map);
 
-        /*incorrect input now*/
-        Tower negative = new Catapult(-1,-1,map);
-        Tower nullMap = new Catapult(ARENA_SIZE/2, ARENA_SIZE/2, null);
+
     }
+
+    @Test(expected =  Exception.class)
+    public void wrongIceConstructor() {
+        int r1 = 10;
+        mapObject[][] map = new mapObject[ARENA_SIZE][ARENA_SIZE]; //Purpose: check
+        for (int i = 0; i < ARENA_SIZE; ++i)
+            for (int j = 0; j < ARENA_SIZE; ++j)
+                map[i][j] = new mapObject(i, j, null, null);
+        /*incorrect input now*/
+        Tower negative = new Ice(-1,-1, r1, map);
+        Tower nullMap = new Ice(ARENA_SIZE/2, ARENA_SIZE/2, r1, null);
+        Tower negativeR1 = new Ice(ARENA_SIZE/2, ARENA_SIZE/2, -1, map);
+    }
+
+//@Ignore
+    @Test
+    public void rightCatapultConstructor() {
+        int r1 = 5, r2= 10;
+        mapObject[][] map = new mapObject[ARENA_SIZE][ARENA_SIZE]; //Purpose: check
+        for (int i = 0; i < ARENA_SIZE; ++i)
+            for (int j = 0; j < ARENA_SIZE; ++j)
+                map[i][j] = new mapObject(i, j, null, null);
+        Tower center = new Catapult(ARENA_SIZE / 2, ARENA_SIZE / 2, r1, r2, map);
+
+        Tower topLeft = new Catapult(0, 0, r1, r2, map);
+
+        Tower topRight = new Catapult(0, ARENA_SIZE - 1,r1, r2,  map);
+        Tower bottomLeft = new Catapult(ARENA_SIZE - 1, 0,r1, r2,  map);
+        Tower bottomRight = new Catapult(ARENA_SIZE - 1, ARENA_SIZE-1,r1, r2, map);
+/*        for (int i = 0; i < ARENA_SIZE; ++i) {
+            for (int j = 0; j < ARENA_SIZE; ++j)
+                System.out.print(map[i][j].towers.size() + " ");
+            System.out.println();
+        }*/
+
+    }
+
+    @Test(expected = Exception.class)
+    public void wrongCatapultConstructor() {
+        int r1 = 5, r2= 10;
+        mapObject[][] map = new mapObject[ARENA_SIZE][ARENA_SIZE]; //Purpose: check
+        for (int i = 0; i < ARENA_SIZE; ++i)
+            for (int j = 0; j < ARENA_SIZE; ++j)
+                map[i][j] = new mapObject(i, j, null, null);
+        /*incorrect input now*/
+        Tower negative = new Catapult(-1,-1,r1, r2, map);
+        Tower nullMap = new Catapult(ARENA_SIZE/2, ARENA_SIZE/2, ARENA_SIZE/2, ARENA_SIZE/2+1, null);
+        Tower wrongRadius = new Catapult(ARENA_SIZE/2, ARENA_SIZE/2, -1, Integer.MAX_VALUE, map);
+    }
+
 }

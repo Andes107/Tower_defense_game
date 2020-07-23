@@ -7,7 +7,7 @@ import java.util.PriorityQueue;
 
 public class Fox extends Monster{
     public Fox(int x, int y, aNode next) {
-        super(x,y,next);
+        super(x,y,next, 15);
     }
     public void anotherNextAlgorithm(mapObject[][] map) {
         aNode[][] aNodeMap = super.newANodeMap(map, true); //1. create a new aNodeMap

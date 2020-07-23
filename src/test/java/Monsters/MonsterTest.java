@@ -1,3 +1,4 @@
+/*
 package Monsters;
 
 import MapObject.*;
@@ -99,4 +100,4 @@ public class MonsterTest {
             current = current.next;
         }
     }
-}
+}*/

@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class Tower {
     public static final int ARENA_SIZE = 25;
 
-    public int damage = 5;
+    public int damage;
     public int bump;
     public int r1;
     public int x;
@@ -23,6 +23,8 @@ public class Tower {
     public Tower(){} //This is just for my test case for now, should have fixed it afterwards
 
     public Tower(int x, int y, int damage, int bump, int r1) {
+        if (x < 0 || x >= ARENA_SIZE || y < 0 || y >= ARENA_SIZE || damage < 0 || bump < 0 || r1 < 0 || r1 > ARENA_SIZE)
+            throw new IllegalArgumentException();
         this.x = x;
         this.y = y;
         this.damage = damage; //Need this when you use a basic tower's constructor!
@@ -50,14 +52,10 @@ public class Tower {
     }
 
     public void markRadiusKillZone(int x, int y, int di, mapObject[][] map, Tower target) {
-        if (map == null) {
-            System.out.println("Issue: null map; Method: markChordKillZone; Class: Tower");
+        if (map == null)
             throw new NullPointerException();
-        }
-        if (target == null) {
-            System.out.println("Issue: null target; Method: markChordKillZone; Class: Tower");
+        if (target == null)
             throw new NullPointerException();
-        }
         if (y + di < ARENA_SIZE && y + di >= 0 && x >= 0 && x < ARENA_SIZE)
             map[x][y+di].towers.add(target);
         if (y - di >= 0 && y - di < ARENA_SIZE && x >= 0 && x < ARENA_SIZE)
@@ -69,6 +67,19 @@ public class Tower {
     }
 
     public void inflictDamage(mapObject[][] map){};
+
+    public int updateDistribution(int x, int y, int radius1, int radius2, int innerRadius, int index, mapObject[][] map, int[][] distribution) {
+        //x and y are the location of that monster
+        int trueIndex = index;
+        for (int dy = -innerRadius; dy <= innerRadius; ++dy)
+            for (int dx = -(int) (Math.hypot(innerRadius, dy)); dx <= -(int) (Math.hypot(innerRadius, dy)); ++dx)
+                if (x + dx >= 0 && x + dx < ARENA_SIZE && y + dy >= 0 && y + dy < ARENA_SIZE && (dx*dx + dy*dy) > radius1*radius1 &&  (dx*dx + dy*dy) <= radius2*radius2){
+                    distribution[x+dx][y+dy]++;
+                    if (distribution[index / ARENA_SIZE][index % ARENA_SIZE] < distribution[x+dx][y+dy])
+                        trueIndex = (x+dx)*ARENA_SIZE + (y+dy);
+                }
+        return trueIndex;
+    }
 
     public Monster findChordVictim(int x, int y, int dx, int dy, mapObject[][] map, int minDistance) {
         Monster victim = null;

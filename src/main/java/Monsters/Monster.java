@@ -17,10 +17,11 @@ public class Monster {
 
     }
 
-    public Monster (int x, int y, aNode next) {
+    public Monster (int x, int y, aNode next, int health) {
         this.x = x;
         this.y = y;
         this.next = next;
+        this.health = health;
     }
 
     public void nextAlgorithm(mapObject[][] map, boolean isFox) {
