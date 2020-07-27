@@ -2,115 +2,97 @@ package Monsters;
 
 import MapObject.*;
 import java.util.PriorityQueue;
+import java.util.Stack;
 
 public class Monster {
     public static final int ARENA_SIZE = 5;
+//    public static int timestamp = 0; //A technique against priority queue equal weight no FIFO
 
     public int x; //current position
     public int y; //current position
-    public aNode next; //this is a linked list where next stores next step's information plus what's next
-    public int speed; //the monster will move after speed amount of game loops, adjust per difficulty
+    public Stack<aNode> next; //this is a linked list where next stores next step's information plus what's next
+    public int maxCounter; //the monster will move after speed amount of game loops, adjust per difficulty
     public int counter; //counter means how many game loops left until next move
     public int health; //may reduce per game loop, may be negative, adjust per difficulty
 
-    public Monster() {
-
-    }
-
-    public Monster (int x, int y, aNode next, int health) {
+    public Monster(int x, int y, int maxCounter, int health) {
+        if (x < 0 || x >= ARENA_SIZE || y < 0 || y >= ARENA_SIZE || maxCounter <= 0 || health <= 0)
+            throw new IllegalArgumentException();
         this.x = x;
         this.y = y;
-        this.next = next;
+        this.next = null;
+        this.maxCounter = maxCounter;
+        this.counter = this.maxCounter;
         this.health = health;
     }
 
-    public void nextAlgorithm(mapObject[][] map, boolean isFox) {
-        aNode[][] aNodeMap = newANodeMap(map, isFox); //1. create a new aNodeMap
-
-        PriorityQueue<aNode> pq = newPriorityMap(aNodeMap[this.x][this.y], isFox); //2. create a new priority queue with starting point added
-        aNode current;
-
-        while (pq.isEmpty() == false) {
-            current = pq.poll();
-            if (endPointReached(current.x, current.y)) //3. Is the end point reached?
-                break;
-            aNode[] neighbours = findNeighbour(current.x, current.y, aNodeMap); //4. The end point isn't reached, find me the neigbours
-            for (aNode neighbour : neighbours) //5. process all my neighbours
-                processNeighbour(current, neighbour, pq, false);
-            current.status = 2; //6. the current node has processed all neighbours!
+    public Stack<aNode> nextAlgorithm(mapObject[][] map, boolean isFox) {
+        if (map == null)
+            throw new IllegalArgumentException();
+        aNode[][] aNodeSet = new aNode[ARENA_SIZE][ARENA_SIZE];
+        for (int i = 0; i < ARENA_SIZE; ++i) {
+            for (int j = 0; j < ARENA_SIZE; ++j) {
+                aNodeSet[i][j] = new aNode(map[i][j], isFox);
+            }
         }
-        next = updateNext(aNodeMap[ARENA_SIZE - 1][ARENA_SIZE - 1], this.x, this.y); //6. Update my next after all these work
-    }
-
-    public aNode[][] newANodeMap(mapObject[][] map, boolean isFox) {
-        aNode[][] aNodeMap = new aNode[ARENA_SIZE][ARENA_SIZE];
-        for (int i = 0; i < ARENA_SIZE; ++i)
-            for (int j = 0; j < ARENA_SIZE; ++j)
-                aNodeMap[i][j] = new aNode(map[i][j],isFox);
-        return aNodeMap;
-    }
-
-    public PriorityQueue<aNode> newPriorityMap(aNode node, boolean isFox) {
         PriorityQueue<aNode> pq = new PriorityQueue<aNode>();
-        node.status = 1;
-        if (isFox == false) {
-            node.g = 0;
-            node.f = node.h;
-        } else
-            //g has nothing to mark since we need no such thing
-            //h marks the maximal estimated damage by staying in this grid, no change either
-            node.f = node.h; //f marks the maximal damage sucked as of starting point
-        pq.add(node);
-        return pq;
+        pq.add(initializeStart(aNodeSet[this.x][this.y]));
+
+        while (pq.isEmpty() == false && !(pq.peek().x == ARENA_SIZE - 1 && pq.peek().y == ARENA_SIZE - 1)) {
+            aNode curr = pq.poll();
+            System.out.println("x: " + curr.x + " y: " + curr.y);
+            for (aNode neighbour : findNeighbours(curr, aNodeSet))
+                processNeighbour(curr, neighbour, pq);
+        }
+        return createStack(aNodeSet[ARENA_SIZE - 1][ARENA_SIZE - 1], this.x, this.y);
     }
 
-    public boolean endPointReached(int x, int y) {
-        return (x == ARENA_SIZE - 1 && y == ARENA_SIZE - 1 ? true : false);
+    public aNode initializeStart(aNode start) {
+        start.fromStart = 0;
+        start.totalDistance = start.fromStart + start.minToEnd;
+        return start;
     }
 
-    public aNode[] findNeighbour(int x, int y, aNode[][] aNodeMap) {
-        aNode[] neighbour = new aNode[4];
+    public aNode[] findNeighbours(aNode curr, aNode[][] aNodeSet) {
+        aNode[] neighbours = new aNode[4];
         int index = 0;
-        if (x + 1 < ARENA_SIZE && aNodeMap[x+1][y].monster == null && aNodeMap[x+1][y].tower == null && aNodeMap[x+1][y].status != 2)
-            neighbour[index++] = aNodeMap[x + 1][y];
-        if (y + 1 < ARENA_SIZE && aNodeMap[x][y+1].monster == null && aNodeMap[x][y+1].tower == null && aNodeMap[x][y+1].status != 2)
-            neighbour[index++] = aNodeMap[x][y + 1];
-        if (x - 1 >= 0 && aNodeMap[x-1][y].monster == null && aNodeMap[x-1][y].tower == null && aNodeMap[x-1][y].status != 2)
-            neighbour[index++] = aNodeMap[x - 1][y];
-        if (y - 1 >= 0 && aNodeMap[x][y-1].monster == null && aNodeMap[x][y-1].tower == null && aNodeMap[x][y-1].status != 2)
-            neighbour[index++] = aNodeMap[x][y - 1];
-        return neighbour;
+        if (curr.x + 1 < ARENA_SIZE && aNodeSet[curr.x+1][curr.y].monster == null && aNodeSet[curr.x+1][curr.y].tower == null)
+            neighbours[index++] = aNodeSet[curr.x+1][curr.y];
+        if (curr.x - 1 >= 0 && aNodeSet[curr.x-1][curr.y].monster == null && aNodeSet[curr.x-1][curr.y].tower == null)
+            neighbours[index++] = aNodeSet[curr.x-1][curr.y];
+        if (curr.y + 1 < ARENA_SIZE && aNodeSet[curr.x][curr.y+1].monster == null && aNodeSet[curr.x][curr.y+1].tower == null)
+            neighbours[index++] = aNodeSet[curr.x][curr.y+1];
+        if (curr.y - 1 >= 0  && aNodeSet[curr.x][curr.y-1].monster == null && aNodeSet[curr.x][curr.y-1].tower == null)
+            neighbours[index++] = aNodeSet[curr.x][curr.y-1];
+            System.out.println("Index: " + (index));
+            for (aNode neighbour: neighbours)
+                if (neighbour != null)
+                    System.out.println("x: " + neighbour.x + " y: " + neighbour.y);
+        return neighbours;
     }
 
-    public void processNeighbour(aNode current, aNode neighbour, PriorityQueue<aNode> pq, boolean isFox) {
-        if (neighbour == null || neighbour.status == 2) //so what remains must be in status 0 or 1: not discovered or neighbours not spanned
+    public void processNeighbour(aNode curr, aNode neighbour, PriorityQueue<aNode> pq) {
+        if (curr == null || neighbour == null || pq == null)
             return;
-        if (isFox == false) {
-            if (current.g + 1 < neighbour.g) { //Relaxation in general monster A* algorithm
-                pq.remove(neighbour); //This neighbour is either not discovered or not spanned its neighbours, but remove it be4 relax
-                neighbour.g = current.g + 1;
-                neighbour.f = neighbour.g + neighbour.h;
-                neighbour.prev = current;
-            }
+        if (curr.fromStart + neighbour.edgeCost < neighbour.fromStart) {
+            System.out.println("curr.x: " + curr.x + " curr.y: " + curr.y + " neighbour.x: " + neighbour.x + " neighbour.y: " +neighbour.y);
+            System.out.println();
+            pq.remove(neighbour);
+            neighbour.fromStart = curr.fromStart + neighbour.edgeCost;
+            neighbour.totalDistance = neighbour.fromStart + neighbour.minToEnd;// + (++Monster.timestamp); //for Dijkstra, mintoend always 0; for A*, intended
+            neighbour.prev = curr;
+            pq.add(neighbour);
         }
-        else {
-            if (current.f + neighbour.h < neighbour.f) { //Relaxation in fox Dikjastra algorithm
-                pq.remove(neighbour); //Because it will be relaxed, so remove it first!
-                neighbour.f = current.f + neighbour.h;//f is the max damage sucked up so far, h is just the estimated dmg for this node
-                neighbour.prev = current;
-            }
-        }
-        neighbour.status = (neighbour.status == 0? 1 : neighbour.status); //if 0, now explored; if 1, now relaxed, no one the wiser
-        pq.add(neighbour); //either 0 or 1, fox or monster, requires to be added after relaxed parameters
     }
 
-    public aNode updateNext(aNode endPoint, int start_x, int start_y) {
-        if (endPoint.prev == null)
+    public Stack<aNode> createStack(aNode curr, int monsterX, int monsterY) {
+        if (curr.prev == null)
             return null;
-        do {
-            endPoint.prev.next = endPoint;
-            endPoint = endPoint.prev;
-        } while (endPoint.x != start_x || endPoint.y != start_y);
-        return endPoint.next;
+        Stack<aNode> next = new Stack<aNode>();
+        while (!(curr.x == monsterX && curr.y == monsterY)) {
+            next.push(curr);
+            curr = curr.prev;
+        }
+        return next;
     }
 }

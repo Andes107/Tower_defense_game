@@ -17,7 +17,7 @@ public class Ice extends Tower {
     public void inflictDamage(mapObject[][] map) { //assumed monster is correctly plotted on the map
         if (map == null)
             throw new NullPointerException();
-        Monster victim = new Monster(-1, -1, null, 0);
+        Monster victim = new Monster(-1, -1, 5, 0);
         for (int dy = -r1; dy <= r1; ++dy)
             for (int dx = -(int)(Math.sqrt(r1*r1-dy*dy)); dx <= Math.abs((int)(Math.sqrt(r1*r1-dy*dy))); ++dx)
                 if (this.x + dx >= 0 && this.x + dx < ARENA_SIZE && this.y + dy >= 0 && this.y + dy < ARENA_SIZE && map[this.x + dx][this.y + dy].monster != null && Math.hypot(ARENA_SIZE - map[this.x + dx][this.y + dy].monster.x, ARENA_SIZE - map[this.x + dx][this.y + dy].monster.y) < Math.hypot(ARENA_SIZE - victim.x, ARENA_SIZE - victim.y))
