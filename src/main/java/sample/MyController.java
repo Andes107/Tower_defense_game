@@ -68,49 +68,6 @@ public class MyController {
     private int x = -1, y = 0; //where is my monster
     private newFox subject1;
 
-    /*
-    * so today's job is to decide the game flow
-    * first way is to make the monster suck up the fucking damage
-    * i suppose there will be a list of monsters
-    * there will be a for loop of monsters
-    * for each monsters, the calculate the accumulated damage and speed reduction through the map
-    * then they reduce the health point and speed by it
-    * well there are 4 towers: basic, ice, death star and catapult
-    * well there are 2 types of towers: simple and complicated
-    * the simple ones are basic and ice, they have cool down time, damage, speed reduction as well as
-    * fixed affecting points
-    * they are simple because their kill zone is updated after initialization
-    * death star and catapult are complicated because the first one:
-    * death star has its kill zone updated after cool down time
-    * catapult has kill zone updated at initialization
-    * catapult will decide its actual kill zone afterwards...
-    * no more game loop today
-    * today will do some tower preparation
-    *
-    * each tower need to initializes its kill zone
-    * basic tower: use the radius
-    * ice tower: use the radius
-    * death star: the entire map
-    * catapult: use hollow radius
-    *
-    * each tower need to decide on whom to inflict damage on
-    * basic tower: the monster closest to end point in Eculidean distance
-    * ice tower: the monster closest to end point in Euclidean distance
-    * death star: all monsters in the straight line, honestly i have no idea in implementing this algorithm
-    * catapult: pick a circle that affects the most monsters
-    *
-    * ok, so how about the game loop?
-    * well, the towers pick the damage first
-    * then the game will evaluate player's decision on construction, removal and update of towers
-    * then the monsters will decide on their next move
-    * finally, the system will give birth to a baby monster
-    *
-    * Extra features:
-    * Mouse-on-touch, if you drag the mouse to a monster's image view, then it will show some status
-    * difficulty, the difficulty will increase by time, namely on their health and cool down time
-    * Audio, should play Empires and Allies background music
-    * Graphics, should create beautiful buttons plus stunning background photo
-    * */
     /**
      * A dummy function to show how button click works
      */
