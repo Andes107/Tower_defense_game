@@ -14,10 +14,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.event.*;
 import javafx.fxml.FXML;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.*;
 import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
 
@@ -30,7 +27,39 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MyController {
+
+public class gameController {
+
+    @FXML
+    private AnchorPane leftAnchorPane;
+
+    @FXML
+    private AnchorPane rightAnchorPane;
+
+    @FXML
+    private VBox centerVBox;
+
+    @FXML
+    private VBox topVBox;
+
+    @FXML
+    private VBox leftVBox;
+
+    @FXML
+    private VBox bottomVBox;
+
+    @FXML
+    private Button Test;
+
+    @FXML
+    void actionForClicked(ActionEvent event) {
+        System.out.println("HI");
+    }
+
+}
+
+
+/*public class MyController {
     @FXML
     private Button buttonNextFrame;
 
@@ -68,9 +97,9 @@ public class MyController {
     private int x = -1, y = 0; //where is my monster
     private newFox subject1;
 
-    /**
+    *//**
      * A dummy function to show how button click works
-     */
+     *//*
     @FXML
     private void play() {
         subject1 = new newFox();
@@ -102,9 +131,9 @@ public class MyController {
     }
 
 
-    /**
+    *//**
      * A function that create the Arena
-     */
+     *//*
     @FXML
     public void createArena() {
         if (grids[0][0] != null)
@@ -142,9 +171,9 @@ public class MyController {
         grids[y][x].setText("M");
     }
 
-    /**
+    *//**
      * A function that demo how drag and drop works
-     */
+     *//*
     private void setDragAndDrop() {
         Label target = grids[3][3];
         target.setText("Drop\nHere");
@@ -159,14 +188,14 @@ public class MyController {
         //Anonymous class
         target.setOnDragOver(new EventHandler<DragEvent>() {
             public void handle(DragEvent event) {
-                /* data is dragged over the target */
+                *//* data is dragged over the target *//*
                 System.out.println("onDragOver");
 
-                /* accept it only if it is  not dragged from the same node
-                 * and if it has a string data */
+                *//* accept it only if it is  not dragged from the same node
+                 * and if it has a string data *//*
                 if (event.getGestureSource() != target &&
                         event.getDragboard().hasString()) {
-                    /* allow for both copying and moving, whatever user chooses */
+                    *//* allow for both copying and moving, whatever user chooses *//*
                     event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
                 }
 
@@ -176,9 +205,9 @@ public class MyController {
 
         target.setOnDragEntered(new EventHandler<DragEvent>() {
             public void handle(DragEvent event) {
-                /* the drag-and-drop gesture entered the target */
+                *//* the drag-and-drop gesture entered the target *//*
                 System.out.println("onDragEntered");
-                /* show to the user that it is an actual gesture target */
+                *//* show to the user that it is an actual gesture target *//*
                 if (event.getGestureSource() != target &&
                         event.getDragboard().hasString()) {
                     target.setStyle("-fx-border-color: blue;");
@@ -189,7 +218,7 @@ public class MyController {
         });
         //lambda
         target.setOnDragExited((event) -> {
-            /* mouse moved away, remove the graphical cues */
+            *//* mouse moved away, remove the graphical cues *//*
             target.setStyle("-fx-border-color: black;");
             System.out.println("Exit");
             event.consume();
@@ -229,4 +258,4 @@ class DragDroppedEventHandler implements EventHandler<DragEvent> {
         event.consume();
 
     }
-}
+}*/
