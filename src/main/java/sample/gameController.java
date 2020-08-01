@@ -52,8 +52,19 @@ public class gameController {
     private Button Test;
 
     @FXML
-    void actionForClicked(ActionEvent event) {
-        System.out.println("HI");
+    void actionForClicked() {
+        ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/abstract.jpg")));
+        imageView.setFitWidth(leftAnchorPane.getWidth());
+        imageView.setFitHeight(leftAnchorPane.getHeight());
+        imageView.fitWidthProperty().bind(leftAnchorPane.widthProperty());
+        imageView.fitHeightProperty().bind(leftAnchorPane.heightProperty());
+        leftAnchorPane.getChildren().add(imageView);
+        ImageView fox = new ImageView(new Image(getClass().getResourceAsStream("/fox.png")));
+        fox.fitWidthProperty().bind(leftAnchorPane.heightProperty().divide(10));
+        fox.fitHeightProperty().bind(leftAnchorPane.heightProperty().divide(10));
+        fox.xProperty().bind(leftAnchorPane.widthProperty().divide(2));// x is horizontal!!!
+        fox.yProperty().bind(leftAnchorPane.heightProperty().divide(2));// y is vertical!!!
+        leftAnchorPane.getChildren().add(fox);
     }
 
 }
