@@ -2,6 +2,7 @@ package sample;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.event.*;
 import javafx.fxml.FXML;
@@ -99,87 +100,63 @@ public class MyController {
      * A function that demo how drag and drop works
      */
     private void setDragAndDrop() {
-        Label target = grids[3][3];
-        target.setText("Drop\nHere");
-        Label source1 = labelBasicTower;
-        Label source2 = labelIceTower;
-        source1.setOnDragDetected(new DragEventHandler(source1));
-        source2.setOnDragDetected(new DragEventHandler(source2));
+        AnchorPane target = paneArena;
+        labelBasicTower.setOnDragDetected(mouseEvent -> {
+            Dragboard db = labelBasicTower.startDragAndDrop(TransferMode.ANY);
 
-        target.setOnDragDropped(new DragDroppedEventHandler());
+            ClipboardContent content = new ClipboardContent();
+            content.putString(labelBasicTower.getText());
+            content.putImage(new Image(getClass().getResourceAsStream("/basicTower.png")));
+            db.setContent(content);
+
+            mouseEvent.consume();
+        });
+        paneArena.setOnDragDropped(dragEvent -> {
+            Dragboard db = dragEvent.getDragboard();
+            boolean success = false;
+            System.out.println(dragEvent.getX());
+            System.out.println("Are they equal? " + (dragEvent.getGestureSource() != labelBasicTower));
+            if (db.hasString()) {
+                ((Label)dragEvent.getGestureTarget()).setText(db.getString());
+                success = true;
+            }
+            dragEvent.setDropCompleted(success);
+            dragEvent.consume();
+        }); //Define drop: release your mouse
 
         //well, you can also write anonymous class or even lambda
         //Anonymous class
-        target.setOnDragOver(new EventHandler <DragEvent>() {
-            public void handle(DragEvent event) {
-                /* data is dragged over the target */
-                System.out.println("onDragOver");
+        paneArena.setOnDragOver(event -> {
+//                 data is dragged over the target
+            System.out.println("onDragOver");
 
-                /* accept it only if it is  not dragged from the same node
-                 * and if it has a string data */
-                if (event.getGestureSource() != target &&
-                        event.getDragboard().hasString()) {
-                    /* allow for both copying and moving, whatever user chooses */
-                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                }
-
-                event.consume();
+/*                 accept it only if it is  not dragged from the same node
+             * and if it has a string data */
+            if (event.getGestureSource() != target &&
+                    event.getDragboard().hasString()) {
+/*                     allow for both copying and moving, whatever user chooses */
+                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
-        });
 
-        target.setOnDragEntered(new EventHandler <DragEvent>() {
-            public void handle(DragEvent event) {
-                /* the drag-and-drop gesture entered the target */
-                System.out.println("onDragEntered");
-                /* show to the user that it is an actual gesture target */
-                if (event.getGestureSource() != target &&
-                        event.getDragboard().hasString()) {
-                    target.setStyle("-fx-border-color: blue;");
-                }
+            event.consume();});
 
-                event.consume();
+        paneArena.setOnDragEntered(event -> {
+/*                 the drag-and-drop gesture entered the target */
+            System.out.println("onDragEntered");
+/*                 show to the user that it is an actual gesture target */
+            if (event.getGestureSource() != target &&
+                    event.getDragboard().hasString()) {
+                paneArena.setStyle("-fx-border-color: blue;");
             }
+
+            event.consume();
         });
         //lambda
-        target.setOnDragExited((event) -> {
-                /* mouse moved away, remove the graphical cues */
+/*        paneArena.setOnDragExited((event) -> {
+*//*                 mouse moved away, remove the graphical cues *//*
                 target.setStyle("-fx-border-color: black;");
                 System.out.println("Exit");
                 event.consume();
-        });
-    }
-}
-
-class DragEventHandler implements EventHandler<MouseEvent> {
-    private Label source;
-    public DragEventHandler(Label e) {
-        source = e;
-    }
-    @Override
-    public void handle (MouseEvent event) {
-        Dragboard db = source.startDragAndDrop(TransferMode.ANY);
-
-        ClipboardContent content = new ClipboardContent();
-        content.putString(source.getText());
-        db.setContent(content);
-
-        event.consume();
-    }
-}
-
-class DragDroppedEventHandler implements EventHandler<DragEvent> {
-    @Override
-    public void handle(DragEvent event) {
-        System.out.println("xx");
-        Dragboard db = event.getDragboard();
-        boolean success = false;
-        System.out.println(db.getString());
-        if (db.hasString()) {
-            ((Label)event.getGestureTarget()).setText(db.getString());
-            success = true;
-        }
-        event.setDropCompleted(success);
-        event.consume();
-
+        });*/
     }
 }
