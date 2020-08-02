@@ -1,8 +1,10 @@
 package sample;
 
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.event.*;
 import javafx.fxml.FXML;
@@ -12,6 +14,9 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MyController {
     @FXML
@@ -101,6 +106,15 @@ public class MyController {
      */
     private void setDragAndDrop() {
         AnchorPane target = paneArena;
+        AnchorPane newPane = new AnchorPane();
+        ImageView imgview1 = new ImageView(new Image(getClass().getResourceAsStream("/fox.png")));
+        imgview1.setX(ARENA_HEIGHT/2);
+        imgview1.setY(ARENA_HEIGHT/2);
+        ImageView imgview2 = new ImageView(new Image(getClass().getResourceAsStream("/penguin.png")));
+        imgview2.setX(0);
+        imgview2.setY(0);
+        newPane.getChildren().addAll(imgview1, imgview2);
+        paneArena.getChildren().add(newPane);
         labelBasicTower.setOnDragDetected(mouseEvent -> {
             Dragboard db = labelBasicTower.startDragAndDrop(TransferMode.ANY);
 
@@ -112,6 +126,9 @@ public class MyController {
             mouseEvent.consume();
         });
         paneArena.setOnDragDropped(dragEvent -> {
+            for (Node node : newPane.getChildren())
+                if (node instanceof ImageView && ((ImageView) node).getX() == 0)
+                    newPane.getChildren().remove(node);
             Dragboard db = dragEvent.getDragboard();
             boolean success = false;
             System.out.println(dragEvent.getX());
@@ -128,6 +145,7 @@ public class MyController {
         //Anonymous class
         paneArena.setOnDragOver(event -> {
 //                 data is dragged over the target
+            System.out.println("size of pane: " + paneArena.getChildren().size());
             System.out.println("onDragOver");
 
 /*                 accept it only if it is  not dragged from the same node
