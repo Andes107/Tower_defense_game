@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -23,9 +24,7 @@ import Towers.*;
 import MapObject.*;
 import javafx.util.Duration;
 
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 
 public class gameController {
@@ -37,236 +36,212 @@ public class gameController {
     private AnchorPane rightAnchorPane;
 
     @FXML
-    private VBox centerVBox;
+    private Label basicTower;
 
     @FXML
-    private VBox topVBox;
+    private Label iceTower;
 
     @FXML
-    private VBox leftVBox;
+    private Label deathStar;
 
     @FXML
-    private VBox bottomVBox;
+    private Label catapult;
+
+    private int ARENA_SIZE;
+    private int basicr1;
+    private int basicDamage;
+    private int icer1;
+    private int iceBump;
+    private int deathStarDamage;
+    private int catapultr1;
+    private int catapultr2;
+    private int catapultDamage;
+    private int towerSize;
+
+    private Tower newTower;
+    private List<Tower> towerList;
+    private mapObject[][] map;
+    private List<Monster> monsterList;
 
     @FXML
-    private Button Test;
-
-    @FXML
-    void actionForClicked() {
-        ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/abstract.jpg")));
-        imageView.setFitWidth(leftAnchorPane.getWidth());
-        imageView.setFitHeight(leftAnchorPane.getHeight());
-        imageView.fitWidthProperty().bind(leftAnchorPane.widthProperty());
-        imageView.fitHeightProperty().bind(leftAnchorPane.heightProperty());
-        leftAnchorPane.getChildren().add(imageView);
-        ImageView fox = new ImageView(new Image(getClass().getResourceAsStream("/fox.png")));
-        fox.fitWidthProperty().bind(leftAnchorPane.heightProperty().divide(10));
-        fox.fitHeightProperty().bind(leftAnchorPane.heightProperty().divide(10));
-        fox.xProperty().bind(leftAnchorPane.widthProperty().divide(2));// x is horizontal!!!
-        fox.yProperty().bind(leftAnchorPane.heightProperty().divide(2));// y is vertical!!!
-        leftAnchorPane.getChildren().add(fox);
+    public void initialize() {
+        ARENA_SIZE = 480;
+        basicr1 = 5;
+        basicDamage = 5;
+        icer1 = 5;
+        iceBump = 5;
+        deathStarDamage = 10;
+        catapultr1 = 2;
+        catapultr2 = 4;
+        catapultDamage = 10;
+        towerSize = 5;
+        newTower = null;
+        towerList = new Vector<Tower>();
+        monsterList = new Vector<Monster>();
+        initializeMap(map);
+        initializeDragRelatedEvent();
     }
 
-}
-
-
-/*public class MyController {
-    @FXML
-    private Button buttonNextFrame;
-
-    @FXML
-    private Button buttonSimulate;
-
-    @FXML
-    private Button buttonPlay;
-
-    @FXML
-    private AnchorPane paneArena;
-
-    @FXML
-    private Label labelBasicTower;
-
-    @FXML
-    private Label labelIceTower;
-
-    @FXML
-    private Label labelCatapult;
-
-    @FXML
-    private Label labelLaserTower;
-
-    private mapObject[][] map = new mapObject[ARENA_HEIGHT][ARENA_WIDTH];
-
-    private static final int ARENA_WIDTH = 480;
-    private static final int ARENA_HEIGHT = 480;
-    private static final int GRID_WIDTH = 40;
-    private static final int GRID_HEIGHT = 40;
-    private static final int MAX_H_NUM_GRID = 12;
-    private static final int MAX_V_NUM_GRID = 12;
-
-    private Label grids[][] = new Label[MAX_V_NUM_GRID][MAX_H_NUM_GRID]; //an array of label! god damn it!
-    private int x = -1, y = 0; //where is my monster
-    private newFox subject1;
-
-    *//**
-     * A dummy function to show how button click works
-     *//*
-    @FXML
-    private void play() {
-        subject1 = new newFox();
-        ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/fox.png")));
-        imageView.setFitHeight(20);
-        imageView.setFitWidth(20);
-        subject1.setX(new Random().nextInt(ARENA_HEIGHT));
-        imageView.xProperty().bind(subject1.xProperty());
-        imageView.yProperty().bind(subject1.xProperty());
-        paneArena.getChildren().add(imageView);
-
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(5), ev -> {
-            subject1.setX(new Random().nextInt(ARENA_HEIGHT));
-        }));
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
+    public void initializeMap(mapObject[][] map) {
+        map = new mapObject[ARENA_SIZE] [ARENA_SIZE];
+        for (int i = 0; i < ARENA_SIZE; ++i)
+            for (int j = 0; j < ARENA_SIZE; ++j)
+                map[i][j] = new mapObject(i,j,null,null);
     }
 
-    class newFox {
-        private IntegerProperty x = new SimpleIntegerProperty();
+    public void initializeDragRelatedEvent() {
+        basicTower.setOnDragDetected(mouseEvent -> {
+            Dragboard db = basicTower.startDragAndDrop(TransferMode.ANY);
 
-        public IntegerProperty xProperty() {
-            return x;
-        }
+            ClipboardContent content = new ClipboardContent();
+            content.putString(basicTower.getText());
+            content.putImage(new Image(getClass().getResourceAsStream("/basicTower.png")));
+            db.setContent(content);
 
-        public void setX(int x) {
-            this.x.set(x);
-        }
-    }
-
-
-    *//**
-     * A function that create the Arena
-     *//*
-    @FXML
-    public void createArena() {
-        if (grids[0][0] != null)
-            return; //created already
-        for (int i = 0; i < MAX_V_NUM_GRID; i++)
-            for (int j = 0; j < MAX_H_NUM_GRID; j++) {
-                Label newLabel = new Label();
-                if (j % 2 == 0 || i == ((j + 1) / 2 % 2) * (MAX_V_NUM_GRID - 1))
-                    newLabel.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-                else
-                    newLabel.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
-                newLabel.setLayoutX(j * GRID_WIDTH);
-                newLabel.setLayoutY(i * GRID_HEIGHT);
-                newLabel.setMinWidth(GRID_WIDTH);
-                newLabel.setMaxWidth(GRID_WIDTH);
-                newLabel.setMinHeight(GRID_HEIGHT);
-                newLabel.setMaxHeight(GRID_HEIGHT);
-                newLabel.setStyle("-fx-border-color: black;");
-                grids[i][j] = newLabel;
-                paneArena.getChildren().addAll(newLabel);
-            }
-        setDragAndDrop();
-    }
-
-    @FXML
-    private void nextFrame() {
-        if (x == -1) {
-            grids[0][0].setText("M");
-            x = 0;
-            return;
-        }
-        if (y == MAX_V_NUM_GRID - 1)
-            return;
-        grids[y++][x].setText("");
-        grids[y][x].setText("M");
-    }
-
-    *//**
-     * A function that demo how drag and drop works
-     *//*
-    private void setDragAndDrop() {
-        Label target = grids[3][3];
-        target.setText("Drop\nHere");
-        Label source1 = labelBasicTower;
-        Label source2 = labelIceTower;
-        source1.setOnDragDetected(new DragEventHandler(source1));
-        source2.setOnDragDetected(new DragEventHandler(source2));
-
-        target.setOnDragDropped(new DragDroppedEventHandler());
-
-        //well, you can also write anonymous class or even lambda
-        //Anonymous class
-        target.setOnDragOver(new EventHandler<DragEvent>() {
-            public void handle(DragEvent event) {
-                *//* data is dragged over the target *//*
-                System.out.println("onDragOver");
-
-                *//* accept it only if it is  not dragged from the same node
-                 * and if it has a string data *//*
-                if (event.getGestureSource() != target &&
-                        event.getDragboard().hasString()) {
-                    *//* allow for both copying and moving, whatever user chooses *//*
-                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                }
-
-                event.consume();
-            }
+            mouseEvent.consume();
         });
+        iceTower.setOnDragDetected(mouseEvent -> {
+            Dragboard db = iceTower.startDragAndDrop(TransferMode.ANY);
 
-        target.setOnDragEntered(new EventHandler<DragEvent>() {
-            public void handle(DragEvent event) {
-                *//* the drag-and-drop gesture entered the target *//*
-                System.out.println("onDragEntered");
-                *//* show to the user that it is an actual gesture target *//*
-                if (event.getGestureSource() != target &&
-                        event.getDragboard().hasString()) {
-                    target.setStyle("-fx-border-color: blue;");
-                }
+            ClipboardContent content = new ClipboardContent();
+            content.putString(iceTower.getText());
+            content.putImage(new Image(getClass().getResourceAsStream("/iceTower.png")));
+            db.setContent(content);
 
-                event.consume();
-            }
+            mouseEvent.consume();
         });
-        //lambda
-        target.setOnDragExited((event) -> {
-            *//* mouse moved away, remove the graphical cues *//*
-            target.setStyle("-fx-border-color: black;");
-            System.out.println("Exit");
+        deathStar.setOnDragDetected(mouseEvent -> {
+            Dragboard db = deathStar.startDragAndDrop(TransferMode.ANY);
+
+            ClipboardContent content = new ClipboardContent();
+            content.putString(deathStar.getText());
+            content.putImage(new Image(getClass().getResourceAsStream("/deathStar.png")));
+            db.setContent(content);
+
+            mouseEvent.consume();
+        });
+        catapult.setOnDragDetected(mouseEvent -> {
+            Dragboard db = catapult.startDragAndDrop(TransferMode.ANY);
+
+            ClipboardContent content = new ClipboardContent();
+            content.putString(catapult.getText());
+            content.putImage(new Image(getClass().getResourceAsStream("/catapult.png")));
+            db.setContent(content);
+
+            mouseEvent.consume();
+        });
+        leftAnchorPane.setOnDragOver(event -> {
+            /*                 accept it only if it is  not dragged from the same node
+             * and if it has a string data */
+            if (event.getGestureSource() != leftAnchorPane &&
+                    event.getDragboard().hasString()) {
+                /*                     allow for both copying and moving, whatever user chooses */
+                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+            }
+
             event.consume();
         });
+        leftAnchorPane.setOnDragDropped(dragEvent -> {/*
+            for (Node node : leftAnchorPane.getChildren())
+                if (node instanceof ImageView && ((ImageView) node).getX() == 0)
+                    newPane.getChildren().remove(node);*/
+            Dragboard db = dragEvent.getDragboard();
+/*            boolean success = false;
+            if (db.hasString()) {
+                ((Label)dragEvent.getGestureTarget()).setText(db.getString());
+                success = true;
+            }*/
+            if (dragEvent.getGestureSource() == basicTower)
+                newTower = new Basic((int)(ARENA_SIZE * dragEvent.getX() / leftAnchorPane.getWidth()), (int)(ARENA_SIZE * dragEvent.getY() / leftAnchorPane.getHeight()), basicr1, basicDamage,map);
+            else if (dragEvent.getGestureSource() == iceTower)
+                newTower = new Ice((int)(ARENA_SIZE * dragEvent.getX() / leftAnchorPane.getWidth()), (int)(ARENA_SIZE * dragEvent.getY() / leftAnchorPane.getHeight()), icer1, iceBump,map);
+            else if (dragEvent.getGestureSource() == deathStar)
+                newTower = new DeathStar((int)(ARENA_SIZE * dragEvent.getX() / leftAnchorPane.getWidth()), (int)(ARENA_SIZE * dragEvent.getY() / leftAnchorPane.getHeight()), ARENA_SIZE, deathStarDamage,map);
+            else
+                newTower = new Catapult((int)(ARENA_SIZE * dragEvent.getX() / leftAnchorPane.getWidth()), (int)(ARENA_SIZE * dragEvent.getY() / leftAnchorPane.getHeight()), catapultr1, catapultDamage, catapultr2,map);
+            dragEvent.setDropCompleted(true);
+            dragEvent.consume();
+        });
     }
-}
 
-class DragEventHandler implements EventHandler<MouseEvent> {
-    private Label source;
-    public DragEventHandler(Label e) {
-        source = e;
+    @FXML
+    public void nextFrame(ActionEvent actionEvent) {
+        gameLoop();
     }
-    @Override
-    public void handle (MouseEvent event) {
-        Dragboard db = source.startDragAndDrop(TransferMode.ANY);
 
-        ClipboardContent content = new ClipboardContent();
-        content.putString(source.getText());
-        db.setContent(content);
-
-        event.consume();
+    public void gameLoop() {
+        towerInflictDamage();
+        towerProcessNew();
     }
-}
 
-class DragDroppedEventHandler implements EventHandler<DragEvent> {
-    @Override
-    public void handle(DragEvent event) {
-        System.out.println("xx");
-        Dragboard db = event.getDragboard();
-        boolean success = false;
-        System.out.println(db.getString());
-        if (db.hasString()) {
-            ((Label)event.getGestureTarget()).setText(db.getString());
-            success = true;
+    public void towerInflictDamage() {
+        for (Tower tower : towerList)
+            tower.inflictDamage(map);
+    }
+
+    public void towerProcessNew() {
+        Tower innerNewTower = newTower
+        if (innerNewTower == null)
+            return;
+        if (isSpaceForTower(innerNewTower) && isTowerNotBlock(innerNewTower)) {
+            setTower(innerNewTower);
         }
-        event.setDropCompleted(success);
-        event.consume();
 
     }
-}*/
+
+    public boolean isSpaceForTower(Tower target) {
+        if (target.x - 2 < 0 || target.x + 2 >= ARENA_SIZE || target.y - 2 < 0 || target.y + 2 >= ARENA_SIZE)
+            return false;
+        else
+            for (int i = target.x-2; i < target.x + 2; ++i)
+                for (int j = target.y - 2; j < target.y + 2; ++j)
+                    if (map[i][j].tower != null)
+                        return false;
+        return true;
+    }
+
+    public boolean isTowerNotBlock(Tower target) {
+        for (Monster monster : monsterList)
+            if ((monster.newNext = monster.nextAlgorithm(map, (monster instanceof Fox))) == null)
+                return false;
+        return true;
+    }
+
+    public void setTower(Tower target) {
+        for (int i = target.x-2; i < target.x + 2; ++i)
+            for (int j = target.y - 2; j < target.y + 2; ++j)
+                map[i][j].tower = newTower;
+    }
+
+    public void setTowerImageView(Tower target) {
+        ImageView towerImg = newImageByTower(target);
+        towerImg.fitWidthProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE));
+        towerImg.fitHeightProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE));
+        towerImg.xProperty().bind();
+/* coord: x/AREN -> width - width/AREN
+    size: width/AREN
+        img.setX(leftAnchorPane.getWidth() - leftAnchorPane.getWidth()/10);
+        img.fitWidthProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE));
+        img.fitHeightProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE));
+        img.xProperty().bind(leftAnchorPane.widthProperty().divide(2));
+        img.yProperty().bind(leftAnchorPane.heightProperty().divide(2));
+        img.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown())
+                System.out.println("LEFT");
+            else if (event.isSecondaryButtonDown())
+                System.out.println("RIGHT");
+        });
+        leftAnchorPane.getChildren().add(img);
+*/
+    }
+    public ImageView newImageByTower(Tower target) {
+        if (target instanceof Basic)
+            return new ImageView(new Image(getClass().getResourceAsStream("/basicTower.png")));
+        else if (target instanceof Ice)
+            return new ImageView(new Image(getClass().getResourceAsStream("/iceTower.png")));
+        else if (target instanceof DeathStar)
+            return new ImageView(new Image(getClass().getResourceAsStream("/deathStar.png")));
+        else if (target instanceof Catapult)
+            return new ImageView(new Image(getClass().getResourceAsStream("/catapult.png")));
+    }
+}
