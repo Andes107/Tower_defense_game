@@ -58,8 +58,11 @@ public class gameController {
     private int catapultDamage;
     private int towerSize;
 
-    private Tower newTower;
-    private List<Tower> towerList;
+    private Label newTower;
+    private int updateX;
+    private int updateY;
+    private HashMap<Tower, ImageView> towerList;
+    private HashMap<ImageView, Tower> imageToTowerList;
     private mapObject[][] map;
     private List<Monster> monsterList;
 
@@ -76,8 +79,10 @@ public class gameController {
         catapultDamage = 10;
         towerSize = 5;
         newTower = null;
-        towerList = new Vector<Tower>();
+        towerList = new HashMap<Tower, ImageView>();
+        imageToTowerList = new HashMap<ImageView, Tower>();
         monsterList = new Vector<Monster>();
+        towerSize = 5;
         initializeMap(map);
         initializeDragRelatedEvent();
     }
@@ -151,14 +156,9 @@ public class gameController {
                 ((Label)dragEvent.getGestureTarget()).setText(db.getString());
                 success = true;
             }*/
-            if (dragEvent.getGestureSource() == basicTower)
-                newTower = new Basic((int)(ARENA_SIZE * dragEvent.getX() / leftAnchorPane.getWidth()), (int)(ARENA_SIZE * dragEvent.getY() / leftAnchorPane.getHeight()), basicr1, basicDamage,map);
-            else if (dragEvent.getGestureSource() == iceTower)
-                newTower = new Ice((int)(ARENA_SIZE * dragEvent.getX() / leftAnchorPane.getWidth()), (int)(ARENA_SIZE * dragEvent.getY() / leftAnchorPane.getHeight()), icer1, iceBump,map);
-            else if (dragEvent.getGestureSource() == deathStar)
-                newTower = new DeathStar((int)(ARENA_SIZE * dragEvent.getX() / leftAnchorPane.getWidth()), (int)(ARENA_SIZE * dragEvent.getY() / leftAnchorPane.getHeight()), ARENA_SIZE, deathStarDamage,map);
-            else
-                newTower = new Catapult((int)(ARENA_SIZE * dragEvent.getX() / leftAnchorPane.getWidth()), (int)(ARENA_SIZE * dragEvent.getY() / leftAnchorPane.getHeight()), catapultr1, catapultDamage, catapultr2,map);
+            newTower = (Label)dragEvent.getGestureSource();
+            updateX = (int)(ARENA_SIZE * dragEvent.getX() / leftAnchorPane.getWidth()); //this will be in the map
+            updateY = (int)(ARENA_SIZE * dragEvent.getY() / leftAnchorPane.getHeight());
             dragEvent.setDropCompleted(true);
             dragEvent.consume();
         });
@@ -175,73 +175,63 @@ public class gameController {
     }
 
     public void towerInflictDamage() {
-        for (Tower tower : towerList)
+        for (Tower tower : towerList.keySet())
             tower.inflictDamage(map);
     }
 
     public void towerProcessNew() {
-        Tower innerNewTower = newTower
-        if (innerNewTower == null)
-            return;
-        if (isSpaceForTower(innerNewTower) && isTowerNotBlock(innerNewTower)) {
-            setTower(innerNewTower);
-        }
+        if (backendIsMapAvailable())
+            updateHashMaps(backendNewTower(),frontendNewImageView());
+    }
+
+    public void towerProcessUpgrade() {
 
     }
 
-    public boolean isSpaceForTower(Tower target) {
-        if (target.x - 2 < 0 || target.x + 2 >= ARENA_SIZE || target.y - 2 < 0 || target.y + 2 >= ARENA_SIZE)
-            return false;
+    public boolean backendIsMapAvailable() {
+        for (int i = updateX; i <= updateX + towerSize; ++i)
+            for (int j = updateY; j <= updateY  + towerSize; ++j)
+                if (i < 0 || i >= ARENA_SIZE || j < 0 || j >= ARENA_SIZE || map[i][j].tower != null || map[i][j].monster != null)
+                    return false;
+        return true;
+    }
+
+    public Tower backendNewTower() {
+        if (newTower == basicTower)
+            return new Basic(updateX / 2, updateY / 2, basicr1, basicDamage,map);
+         else if (newTower == iceTower)
+            return new Ice(updateX / 2, updateY /2 , icer1, iceBump,map);
+        else if (newTower == deathStar)
+            return new DeathStar(updateX / 2, updateY / 2, ARENA_SIZE, deathStarDamage,map);
         else
-            for (int i = target.x-2; i < target.x + 2; ++i)
-                for (int j = target.y - 2; j < target.y + 2; ++j)
-                    if (map[i][j].tower != null)
-                        return false;
-        return true;
+            return new Catapult(updateX / 2, updateY / 2, catapultr1, catapultDamage, catapultr2,map);
     }
 
-    public boolean isTowerNotBlock(Tower target) {
-        for (Monster monster : monsterList)
-            if ((monster.newNext = monster.nextAlgorithm(map, (monster instanceof Fox))) == null)
-                return false;
-        return true;
-    }
-
-    public void setTower(Tower target) {
-        for (int i = target.x-2; i < target.x + 2; ++i)
-            for (int j = target.y - 2; j < target.y + 2; ++j)
-                map[i][j].tower = newTower;
-    }
-
-    public void setTowerImageView(Tower target) {
-        ImageView towerImg = newImageByTower(target);
-        towerImg.fitWidthProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE));
-        towerImg.fitHeightProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE));
-        towerImg.xProperty().bind();
-/* coord: x/AREN -> width - width/AREN
-    size: width/AREN
-        img.setX(leftAnchorPane.getWidth() - leftAnchorPane.getWidth()/10);
-        img.fitWidthProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE));
-        img.fitHeightProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE));
-        img.xProperty().bind(leftAnchorPane.widthProperty().divide(2));
-        img.yProperty().bind(leftAnchorPane.heightProperty().divide(2));
-        img.setOnMousePressed(event -> {
+    public ImageView frontendNewImageView() {
+        ImageView frontEndTower;
+        if (newTower == basicTower)
+            frontEndTower = new ImageView(new Image(getClass().getResourceAsStream("/basicTower")));
+        else if (newTower == iceTower)
+            frontEndTower = new ImageView(new Image(getClass().getResourceAsStream("/iceTower")));
+        else if (newTower == deathStar)
+            frontEndTower = new ImageView(new Image(getClass().getResourceAsStream("/deathStar")));
+        else
+            frontEndTower = new ImageView(new Image(getClass().getResourceAsStream("/catapult")));
+        frontEndTower.fitWidthProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE));
+        frontEndTower.fitHeightProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE));
+        frontEndTower.xProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE).multiply(updateX));
+        frontEndTower.yProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE).multiply(updateY));
+        frontEndTower.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown())
                 System.out.println("LEFT");
             else if (event.isSecondaryButtonDown())
                 System.out.println("RIGHT");
         });
-        leftAnchorPane.getChildren().add(img);
-*/
+        return frontEndTower;
     }
-    public ImageView newImageByTower(Tower target) {
-        if (target instanceof Basic)
-            return new ImageView(new Image(getClass().getResourceAsStream("/basicTower.png")));
-        else if (target instanceof Ice)
-            return new ImageView(new Image(getClass().getResourceAsStream("/iceTower.png")));
-        else if (target instanceof DeathStar)
-            return new ImageView(new Image(getClass().getResourceAsStream("/deathStar.png")));
-        else if (target instanceof Catapult)
-            return new ImageView(new Image(getClass().getResourceAsStream("/catapult.png")));
+
+    public void updateHashMaps(Tower backendTower, ImageView frontendTower) {
+        towerList.put(backendTower,frontendTower);
+        imageToTowerList.put(frontendTower,backendTower);
     }
 }
