@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -57,7 +58,9 @@ public class MyController {
      */
     @FXML
     private void play() {
-        System.out.println("Play button clicked");
+        for (Node node : paneArena.getChildren())
+            if (node instanceof ImageView)
+                System.out.println("nodex: " + ((ImageView)node).getX());
     }
 
     /**
@@ -83,9 +86,10 @@ public class MyController {
                 newLabel.setStyle("-fx-border-color: black;");
                 grids[i][j] = newLabel;
                 paneArena.getChildren().addAll(newLabel);
+                System.out.println("size: " + paneArena.getChildren().size());
             }
 
-        setDragAndDrop();
+//        setDragAndDrop();
     }
 
     @FXML
@@ -101,10 +105,34 @@ public class MyController {
         grids[y][x].setText("M");
     }
 
+    class Fox {
+        SimpleIntegerProperty x;
+        int y;
+        public Fox(int x, int y) {
+            this.x.set(x);
+            this.y = y;
+        }
+        public SimpleIntegerProperty
+    }
+
+    private Fox testFox;
+
+    @FXML
+    public void initialize() {
+        System.out.println("HI");
+        System.out.println("size: " + paneArena.getChildren().size());
+        testFox = new Fox(0,0);
+        ImageView testImg = new ImageView(new Image(getClass().getResourceAsStream("/fox.png")));
+        testImg.xProperty().bind(paneArena.widthProperty().subtract(testFox.x).divide(2));
+        paneArena.getChildren().add(testImg);
+        System.out.println("size: " + paneArena.getChildren().size());
+
+    }
+
     /**
      * A function that demo how drag and drop works
      */
-    private void setDragAndDrop() {
+/*    private void setDragAndDrop() {
         AnchorPane target = paneArena;
         AnchorPane newPane = new AnchorPane();
         ImageView imgview1 = new ImageView(new Image(getClass().getResourceAsStream("/fox.png")));
@@ -148,20 +176,20 @@ public class MyController {
             System.out.println("size of pane: " + paneArena.getChildren().size());
             System.out.println("onDragOver");
 
-/*                 accept it only if it is  not dragged from the same node
-             * and if it has a string data */
+*//*                 accept it only if it is  not dragged from the same node
+             * and if it has a string data *//*
             if (event.getGestureSource() != target &&
                     event.getDragboard().hasString()) {
-/*                     allow for both copying and moving, whatever user chooses */
+*//*                     allow for both copying and moving, whatever user chooses *//*
                 event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
 
             event.consume();});
 
         paneArena.setOnDragEntered(event -> {
-/*                 the drag-and-drop gesture entered the target */
+*//*                 the drag-and-drop gesture entered the target *//*
             System.out.println("onDragEntered");
-/*                 show to the user that it is an actual gesture target */
+*//*                 show to the user that it is an actual gesture target *//*
             if (event.getGestureSource() != target &&
                     event.getDragboard().hasString()) {
                 paneArena.setStyle("-fx-border-color: blue;");
@@ -170,11 +198,11 @@ public class MyController {
             event.consume();
         });
         //lambda
-/*        paneArena.setOnDragExited((event) -> {
-*//*                 mouse moved away, remove the graphical cues *//*
+*//*        paneArena.setOnDragExited((event) -> {
+*//**//*                 mouse moved away, remove the graphical cues *//**//*
                 target.setStyle("-fx-border-color: black;");
                 System.out.println("Exit");
                 event.consume();
-        });*/
-    }
+        });*//*
+    }*/
 }
