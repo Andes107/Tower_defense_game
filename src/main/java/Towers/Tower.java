@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class Tower {
-    public static final int ARENA_SIZE = 5;
+    public static int ARENA_SIZE;
 
     public int x;
     public int y;
