@@ -5,6 +5,8 @@ import Monsters.Monster;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 public abstract class Tower {
     public static int ARENA_SIZE;
@@ -38,5 +40,19 @@ public abstract class Tower {
                         trueIndex = (monsterX + monsterDx)*ARENA_SIZE + (monsterY + monsterDy);
                 }
         return trueIndex;
+    }
+
+    public static void towerInflictDamage(Set<Tower> towerFromController, mapObject[][] mapFromController) {
+        for (Tower tower : towerFromController)
+            tower.inflictDamage(mapFromController);
+    }
+
+    public static boolean backendIsMapAvailable(int newTowerBackXFrontY, int newTowerBackYFrontX, int newTowerBackFrontSize, mapObject[][] map) {
+        System.out.println("backendismapavailable");
+        for (int i = newTowerBackXFrontY; i <= newTowerBackXFrontY + newTowerBackFrontSize; ++i)
+            for (int j = newTowerBackYFrontX; j <= newTowerBackYFrontX + newTowerBackFrontSize; ++j)
+                if (i < 0 || i >= ARENA_SIZE || j < 0 || j >= ARENA_SIZE || map[i][j].tower != null || map[i][j].monster != null)
+                    return false;
+        return true;
     }
 }

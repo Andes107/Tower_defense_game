@@ -17,7 +17,7 @@ public class Monster {
     public int health; //may reduce per game loop, may be negative, adjust per difficulty
 
     public Monster(int x, int y, int maxCounter, int health) {
-        if (x < 0 || x >= ARENA_SIZE || y < 0 || y >= ARENA_SIZE || maxCounter <= 0 || health <= 0)
+        if (x < -1 || x >= ARENA_SIZE || y < -1 || y >= ARENA_SIZE || maxCounter <= 0 || health <= 0)
             throw new IllegalArgumentException();
         this.x = x;
         this.y = y;
