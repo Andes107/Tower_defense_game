@@ -38,4 +38,16 @@ public class Catapult extends Tower{
                         map[killX + killDx][killY + killDy].monster.health -= this.damage;
         }
     }
+
+    @Override
+    public void towerDelBackRemoveKillZone(mapObject[][] map) {
+        System.out.println("Catapult towerDelBackRemoveKillZone");
+        for (int dy = -r2; dy <= r2; ++dy)
+            for (int dx = -(int) (Math.sqrt(r2 * r2 - dy * dy)); dx <= Math.abs((int) (Math.sqrt(r2 * r2 - dy * dy))); ++dx)
+                if ((dx*dx + dy*dy > this.r1*this.r1) && this.x + dx >= 0 && this.x + dx < ARENA_SIZE && this.y + dy >= 0 && this.y+dy < ARENA_SIZE){
+                    if (map[this.x + dx][this.y + dy].towers.contains(this) == false)
+                        throw new IllegalArgumentException();
+                    map[this.x + dx][this.y + dy].towers.remove(this);
+                }
+    }
 }

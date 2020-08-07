@@ -39,4 +39,9 @@ public class DeathStar extends Tower{
             }
         }
     }
+
+    @Override
+    public void towerDelBackRemoveKillZone(mapObject[][] map) {
+        System.out.println("DeathStar towerDelBackRemoveKillZone has nothing to do");
+    }
 }

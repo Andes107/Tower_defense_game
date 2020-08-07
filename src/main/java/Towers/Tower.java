@@ -30,6 +30,8 @@ public abstract class Tower {
 
     public abstract void inflictDamage(mapObject[][] map);
 
+    public abstract void towerDelBackRemoveKillZone(mapObject[][] map);
+
     public int updateDistribution(int monsterX, int monsterY, int towerX, int towerY, int radius1, int radius2, int innerRadius, int index, mapObject[][] map, int[][] distribution) {
         //x and y are the location of that monster
         int trueIndex = index;
@@ -48,23 +50,32 @@ public abstract class Tower {
             tower.inflictDamage(mapFromController);
     }
 
-    public static boolean towerNewBackendMapAva(int newTowerBackXFrontY, int newTowerBackYFrontX, int newTowerBackFrontSize, mapObject[][] map) {
+    public static boolean towerNewBackMapAva(int towerNewBackXFrontY, int towerNewBackYFrontX, int towerNewBackFrontSize, mapObject[][] map) {
         System.out.println("backendismapavailable");
-        for (int i = newTowerBackXFrontY - newTowerBackFrontSize / 2; i <= newTowerBackXFrontY + newTowerBackFrontSize / 2; ++i)
-            for (int j = newTowerBackYFrontX - newTowerBackFrontSize / 2; j <= newTowerBackYFrontX + newTowerBackFrontSize / 2; ++j)
+        for (int i = towerNewBackXFrontY - towerNewBackFrontSize / 2; i <= towerNewBackXFrontY + towerNewBackFrontSize / 2; ++i)
+            for (int j = towerNewBackYFrontX - towerNewBackFrontSize / 2; j <= towerNewBackYFrontX + towerNewBackFrontSize / 2; ++j)
                 if (i < 0 || i >= ARENA_SIZE || j < 0 || j >= ARENA_SIZE || map[i][j].tower != null || map[i][j].monster != null)
                     return false;
         return true;
     }
 
-    public static void towerNewBackEndFillMap(Tower newTower, int newTowerBackXFrontY, int newTowerBackYFrontX, int newTowerBackFrontSize, mapObject[][] map) {
+    public static void towerNewBackFillMap(Tower newTower, int towerNewBackXFrontY, int towerNewBackYFrontX, int towerNewBackFrontSize, mapObject[][] map) {
         System.out.println("backendFillMap");
-        for (int i = newTowerBackXFrontY - newTowerBackFrontSize / 2; i <= newTowerBackXFrontY + newTowerBackFrontSize / 2; ++i)
-            for (int j = newTowerBackYFrontX - newTowerBackFrontSize / 2; j <= newTowerBackYFrontX + newTowerBackFrontSize / 2; ++j) {
+        for (int i = towerNewBackXFrontY - towerNewBackFrontSize / 2; i <= towerNewBackXFrontY + towerNewBackFrontSize / 2; ++i)
+            for (int j = towerNewBackYFrontX - towerNewBackFrontSize / 2; j <= towerNewBackYFrontX + towerNewBackFrontSize / 2; ++j) {
                 if (map[i][j].tower != null)
                     throw new IllegalArgumentException();
                 map[i][j].tower = newTower;
+            }
+    }
 
+    public static void towerDelBackRemoveMap(Tower delTower, int towerDelBackFrontSize, mapObject[][] map) {
+        System.out.println("BackRemoveMap");
+        for (int i = delTower.x - towerDelBackFrontSize / 2; i <= delTower.x + towerDelBackFrontSize / 2; ++i)
+            for (int j = delTower.y - towerDelBackFrontSize / 2; j <= delTower.y + towerDelBackFrontSize / 2; ++j) {
+                if (map[i][j].tower == null)
+                    throw new IllegalArgumentException();
+                map[i][j].tower = null;
             }
     }
 }

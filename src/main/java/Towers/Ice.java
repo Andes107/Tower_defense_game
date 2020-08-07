@@ -25,4 +25,16 @@ public class Ice extends Tower {
                     victim = map[this.x + dx][this.y + dy].monster;
         victim.counter += this.bump;
     }
+
+    @Override
+    public void towerDelBackRemoveKillZone(mapObject[][] map) {
+        System.out.println("Ice towerDelBackRemoveKillZone");
+        for (int dy = -r1; dy <= r1; ++dy)
+            for (int dx = -(int)(Math.sqrt(r1*r1-dy*dy)); dx <= Math.abs((int)(Math.sqrt(r1*r1-dy*dy))); ++dx)
+                if (x + dx >= 0 && x + dx < ARENA_SIZE && y + dy >= 0 && y+dy < ARENA_SIZE) {
+                    if (map[this.x + dx][this.y + dy].towers.contains(this) == false)
+                        throw new IllegalArgumentException();
+                    map[this.x + dx][this.y + dy].towers.remove(this);
+                }
+    }
 }
