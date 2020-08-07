@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -41,10 +42,10 @@ public class gameController {
     /*Ice.java: x,y*/private int icer1; private int iceBump; /*Ice.java map*/
     /*DeathStar.java: x,y, r1: ARENA_SIZE*/private int deathStarDamage; /*DeathStar.java map*/
     /*Catapult.java: x,y*/private int catapultr1; private int catapultDamage; private int catapultr2; /*Catapult.java map*/
-    private int newTowerBackXFrontY;
-    private int newTowerBackYFrontX;
-    private int newTowerBackFrontSize;
-    private Label newTowerFrontLabel;
+    private int towerNewBackXFrontY;
+    private int towerNewBackYFrontX;
+    private int towerNewBackFrontSize;
+    private Label towerNewFrontLabel;
 
     private HashMap<Tower, ImageView> towerToImageMap;
     private HashMap<ImageView, Tower> imageToTowerMap;
@@ -65,13 +66,13 @@ public class gameController {
         catapultr1 = 5;
         catapultr2 = 10;
         catapultDamage = 10;
-        newTowerBackFrontSize = 5;
-        newTowerFrontLabel = null;
+        towerNewBackFrontSize = 5;
+        towerNewFrontLabel = null;
         towerToImageMap = new HashMap<Tower, ImageView>();
         imageToTowerMap = new HashMap<ImageView, Tower>();
         monsterList = new Vector<Monster>();
-        newTowerBackXFrontY = -1;
-        newTowerBackYFrontX = -1;
+        towerNewBackXFrontY = -1;
+        towerNewBackYFrontX = -1;
         initializeMap();
         initializeDragRelatedEvent();
         System.out.println("map is null: " + (map == null));
@@ -146,12 +147,12 @@ public class gameController {
                 ((Label)dragEvent.getGestureTarget()).setText(db.getString());
                 success = true;
             }*/
-            newTowerFrontLabel = (Label)dragEvent.getGestureSource();
-            System.out.println("label instanceof Label? " + (newTowerFrontLabel == basicTower));
-            newTowerBackXFrontY = (int)(ARENA_SIZE * dragEvent.getY() / leftAnchorPane.getHeight());
-            System.out.println("backend updateX: " + newTowerBackXFrontY);
-            newTowerBackYFrontX = (int)(ARENA_SIZE * dragEvent.getX() / leftAnchorPane.getWidth()); //this will be in the map
-            System.out.println("backend updateY: " + newTowerBackYFrontX);
+            towerNewFrontLabel = (Label)dragEvent.getGestureSource();
+            System.out.println("label instanceof Label? " + (towerNewFrontLabel == basicTower));
+            towerNewBackXFrontY = (int)(ARENA_SIZE * dragEvent.getY() / leftAnchorPane.getHeight());
+            System.out.println("backend updateX: " + towerNewBackXFrontY);
+            towerNewBackYFrontX = (int)(ARENA_SIZE * dragEvent.getX() / leftAnchorPane.getWidth()); //this will be in the map
+            System.out.println("backend updateY: " + towerNewBackYFrontX);
             dragEvent.setDropCompleted(true);
             dragEvent.consume();
         });
@@ -183,80 +184,80 @@ public class gameController {
     public void gameLoop() {
         System.out.println("gameloop");
         Tower.towerInflictDamage(towerToImageMap.keySet(), map);
-        towerProcessNew();
+        towerNew();
         /*
-        * towerProcessUpgrade();
-        * towerProcessDelete();
+        * towerUp(); Remark: Stuck in UI design, will come back later after some concrete work is done here.
+        * towerDel();
         * monsterNextMove();
         * monsterRandomNew();
         * */
     }
 
-    public void towerProcessNew() {
-        System.out.println("double true: " + Tower.backendIsMapAvailable(newTowerBackXFrontY, newTowerBackYFrontX, newTowerBackFrontSize, map) + " " + frontendIsThereNew());
-        if (Tower.backendIsMapAvailable(newTowerBackXFrontY, newTowerBackYFrontX, newTowerBackFrontSize, map) && frontendIsThereNew()) {
-            updateHashMaps(map[newTowerBackXFrontY + (newTowerBackFrontSize / 2)][newTowerBackYFrontX + (newTowerBackFrontSize / 2)].tower = backendNewTower(), frontendNewImageView());
+    public void towerNew() {
+        System.out.println("double true: " + Tower.towerNewBackendMapAva(towerNewBackXFrontY, towerNewBackYFrontX, towerNewBackFrontSize, map) + " " + towerNewFrontIsNew());
+        if (Tower.towerNewBackendMapAva(towerNewBackXFrontY, towerNewBackYFrontX, towerNewBackFrontSize, map) && towerNewFrontIsNew()) {
+            Tower towerNewTempTower = towerNewGenTower();
+            Tower.towerNewBackEndFillMap(towerNewTempTower, towerNewBackXFrontY, towerNewBackYFrontX, towerNewBackFrontSize, map);
+            towerNewFrontHashUpdate(towerNewTempTower, towerNewFrontGenImgView());
             System.out.println("hash map size: " + towerToImageMap.size() + " " + imageToTowerMap.size());
-            frontendRestore();
-            System.out.println("backend UpdateX: " + newTowerBackXFrontY + " backend UpdateY : " + newTowerBackYFrontX);
+            towerNewFrontRestore();
+            System.out.println("backend UpdateX: " + towerNewBackXFrontY + " backend UpdateY : " + towerNewBackYFrontX);
         }
     }
 
-    public void towerProcessUpgrade() {
-
+    public boolean towerNewFrontIsNew() {
+        return (towerNewFrontLabel != null && towerNewBackXFrontY != -1 && towerNewBackYFrontX != -1);
     }
 
-    public boolean frontendIsThereNew() {
-        return (newTowerFrontLabel != null && newTowerBackXFrontY != -1 && newTowerBackYFrontX != -1);
-    }
-
-    public void frontendRestore() {
-        newTowerFrontLabel = null;
-        newTowerBackXFrontY = -1;
-        newTowerBackYFrontX = -1;
-    }
-
-    public Tower backendNewTower() {
+    public Tower towerNewGenTower() {
         System.out.println("backendnewTower");
-        if (newTowerFrontLabel == basicTower)
-            return new Basic(newTowerBackXFrontY + (newTowerBackFrontSize / 2) , newTowerBackYFrontX + (newTowerBackFrontSize / 2), basicr1, basicDamage,map);
-         else if (newTowerFrontLabel == iceTower)
-            return new Ice(newTowerBackXFrontY + (newTowerBackFrontSize / 2), newTowerBackYFrontX + (newTowerBackFrontSize / 2) , icer1, iceBump,map);
-        else if (newTowerFrontLabel == deathStar)
-            return new DeathStar(newTowerBackXFrontY + (newTowerBackFrontSize / 2), newTowerBackYFrontX + (newTowerBackFrontSize / 2), ARENA_SIZE, deathStarDamage,map);
+        if (towerNewFrontLabel == basicTower)
+            return new Basic(towerNewBackXFrontY + (towerNewBackFrontSize / 2) , towerNewBackYFrontX + (towerNewBackFrontSize / 2), basicr1, basicDamage,map);
+         else if (towerNewFrontLabel == iceTower)
+            return new Ice(towerNewBackXFrontY + (towerNewBackFrontSize / 2), towerNewBackYFrontX + (towerNewBackFrontSize / 2) , icer1, iceBump,map);
+        else if (towerNewFrontLabel == deathStar)
+            return new DeathStar(towerNewBackXFrontY + (towerNewBackFrontSize / 2), towerNewBackYFrontX + (towerNewBackFrontSize / 2), ARENA_SIZE, deathStarDamage,map);
         else
-            return new Catapult(newTowerBackXFrontY + (newTowerBackFrontSize / 2), newTowerBackYFrontX + (newTowerBackFrontSize / 2), catapultr1, catapultDamage, catapultr2,map);
+            return new Catapult(towerNewBackXFrontY + (towerNewBackFrontSize / 2), towerNewBackYFrontX + (towerNewBackFrontSize / 2), catapultr1, catapultDamage, catapultr2,map);
     }
 
-    public ImageView frontendNewImageView() {
+    public ImageView towerNewFrontGenImgView() {
         System.out.println("frontendnewimageview");
         ImageView frontEndTower;
-        if (newTowerFrontLabel == basicTower)
+        if (towerNewFrontLabel == basicTower)
             frontEndTower = new ImageView(new Image(getClass().getResourceAsStream("/basicTower.png")));
-        else if (newTowerFrontLabel == iceTower)
+        else if (towerNewFrontLabel == iceTower)
             frontEndTower = new ImageView(new Image(getClass().getResourceAsStream("/iceTower.png")));
-        else if (newTowerFrontLabel == deathStar)
+        else if (towerNewFrontLabel == deathStar)
             frontEndTower = new ImageView(new Image(getClass().getResourceAsStream("/deathStar.png")));
         else
             frontEndTower = new ImageView(new Image(getClass().getResourceAsStream("/catapult.png")));
         System.out.println("is null? " + (frontEndTower == null));
-        frontEndTower.fitWidthProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE).multiply(newTowerBackFrontSize));
-        frontEndTower.fitHeightProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE).multiply(newTowerBackFrontSize));
-        frontEndTower.xProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE).multiply(newTowerBackYFrontX));
-        frontEndTower.yProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE).multiply(newTowerBackXFrontY));
+        frontEndTower.fitWidthProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE).multiply(towerNewBackFrontSize));
+        frontEndTower.fitHeightProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE).multiply(towerNewBackFrontSize));
+        frontEndTower.xProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE).multiply(towerNewBackYFrontX - towerNewBackFrontSize /2));
+        frontEndTower.yProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE).multiply(towerNewBackXFrontY - towerNewBackFrontSize /2));
         frontEndTower.setOnMousePressed(event -> {
-            if (event.isPrimaryButtonDown())
-                upgradeTower = (ImageView)(event.getSource());
-            else if (event.isSecondaryButtonDown())
-                deleteTower = (ImageView)(event.getSource());
+            if (event.isPrimaryButtonDown()) {
+                System.out.println("Left button hit!!!");
+                upgradeTower = (ImageView) (event.getSource());
+                System.out.println("X: " + upgradeTower.getX() + " Y: " + upgradeTower.getY() + " Ratio: " + upgradeTower.getX() / leftAnchorPane.getWidth());
+            } else if (event.isSecondaryButtonDown())
+                deleteTower = (ImageView) (event.getSource());
         });
         leftAnchorPane.getChildren().add(frontEndTower);
         System.out.println("imgview.x: " + frontEndTower.getX());
         return frontEndTower;
     }
 
-    public void updateHashMaps(Tower backendTower, ImageView frontendTowerImageView) {
+    public void towerNewFrontHashUpdate(Tower backendTower, ImageView frontendTowerImageView) {
         towerToImageMap.put(backendTower,frontendTowerImageView);
         imageToTowerMap.put(frontendTowerImageView,backendTower);
+    }
+
+    public void towerNewFrontRestore() {
+        towerNewFrontLabel = null;
+        towerNewBackXFrontY = -1;
+        towerNewBackYFrontX = -1;
     }
 }
