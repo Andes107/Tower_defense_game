@@ -51,7 +51,6 @@ public abstract class Tower {
     }
 
     public static boolean towerNewBackMapAva(int towerNewBackXFrontY, int towerNewBackYFrontX, int towerNewBackFrontSize, mapObject[][] map) {
-        System.out.println("backendismapavailable");
         for (int i = towerNewBackXFrontY - towerNewBackFrontSize / 2; i <= towerNewBackXFrontY + towerNewBackFrontSize / 2; ++i)
             for (int j = towerNewBackYFrontX - towerNewBackFrontSize / 2; j <= towerNewBackYFrontX + towerNewBackFrontSize / 2; ++j)
                 if (i < 0 || i >= ARENA_SIZE || j < 0 || j >= ARENA_SIZE || map[i][j].tower != null || map[i][j].monster != null)
@@ -60,7 +59,6 @@ public abstract class Tower {
     }
 
     public static void towerNewBackFillMap(Tower newTower, int towerNewBackXFrontY, int towerNewBackYFrontX, int towerNewBackFrontSize, mapObject[][] map) {
-        System.out.println("backendFillMap");
         for (int i = towerNewBackXFrontY - towerNewBackFrontSize / 2; i <= towerNewBackXFrontY + towerNewBackFrontSize / 2; ++i)
             for (int j = towerNewBackYFrontX - towerNewBackFrontSize / 2; j <= towerNewBackYFrontX + towerNewBackFrontSize / 2; ++j) {
                 if (map[i][j].tower != null)
@@ -70,7 +68,6 @@ public abstract class Tower {
     }
 
     public static void towerDelBackRemoveMap(Tower delTower, int towerDelBackFrontSize, mapObject[][] map) {
-        System.out.println("BackRemoveMap");
         for (int i = delTower.x - towerDelBackFrontSize / 2; i <= delTower.x + towerDelBackFrontSize / 2; ++i)
             for (int j = delTower.y - towerDelBackFrontSize / 2; j <= delTower.y + towerDelBackFrontSize / 2; ++j) {
                 if (map[i][j].tower == null)

@@ -41,7 +41,6 @@ public class Catapult extends Tower{
 
     @Override
     public void towerDelBackRemoveKillZone(mapObject[][] map) {
-        System.out.println("Catapult towerDelBackRemoveKillZone");
         for (int dy = -r2; dy <= r2; ++dy)
             for (int dx = -(int) (Math.sqrt(r2 * r2 - dy * dy)); dx <= Math.abs((int) (Math.sqrt(r2 * r2 - dy * dy))); ++dx)
                 if ((dx*dx + dy*dy > this.r1*this.r1) && this.x + dx >= 0 && this.x + dx < ARENA_SIZE && this.y + dy >= 0 && this.y+dy < ARENA_SIZE){

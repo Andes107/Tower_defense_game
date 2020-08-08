@@ -27,7 +27,6 @@ public class Basic extends Tower {
 
     @Override
     public void towerDelBackRemoveKillZone(mapObject[][] map){
-        System.out.println("Basic towerDelBackRemoveKillZone");
         for (int dy = -r1; dy <= r1; ++dy)
             for (int dx = -(int)(Math.sqrt(r1*r1-dy*dy)); dx <= Math.abs((int)(Math.sqrt(r1*r1-dy*dy))); ++dx)
                 if (x + dx >= 0 && x + dx < ARENA_SIZE && y + dy >= 0 && y+dy < ARENA_SIZE){

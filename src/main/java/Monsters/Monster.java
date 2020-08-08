@@ -1,31 +1,62 @@
 package Monsters;
 
 import MapObject.*;
+import javafx.beans.property.SimpleIntegerProperty;
+
+import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Random;
 import java.util.Stack;
 
 public class Monster {
-    public static final int ARENA_SIZE = 5;
+    public static int ARENA_SIZE;
 //    public static int timestamp = 0; //A technique against priority queue equal weight no FIFO
 
     public int x; //current position
     public int y; //current position
-    public Stack<aNode> next; //this is a linked list where next stores next step's information plus what's next
-    public Stack<aNode> newNext;
+    public SimpleIntegerProperty simpleX;
+    public SimpleIntegerProperty simpleY;
     public int maxCounter; //the monster will move after speed amount of game loops, adjust per difficulty
     public int counter; //counter means how many game loops left until next move
     public int health; //may reduce per game loop, may be negative, adjust per difficulty
+
+    public Stack<aNode> next; //this is a linked list where next stores next step's information plus what's next
+    public Stack<aNode> newNext;
 
     public Monster(int x, int y, int maxCounter, int health) {
         if (x < -1 || x >= ARENA_SIZE || y < -1 || y >= ARENA_SIZE || maxCounter <= 0 || health <= 0)
             throw new IllegalArgumentException();
         this.x = x;
         this.y = y;
+        this.simpleX = new SimpleIntegerProperty(this.x);
+        this.simpleY = new SimpleIntegerProperty(this.y);
+        System.out.println("this.simplY: " + simpleY.get());
         this.next = null;
         this.newNext = null;
         this.maxCounter = maxCounter;
         this.counter = this.maxCounter;
         this.health = health;
+    }
+
+    public static Monster monsterNewRanGen(List<mapObject> mapWithoutMonster, mapObject[][] map, int monsterNewHealth, int monsterNewCounter, int monsterNewHealthScalar, int monsterNewCounterScalar) {
+        /*
+        * Objectives:
+        * 1. Remove the mapObject occupied with monster
+        * 2. Fill in the monster in the appropriate mapObject
+        * 3. How to know the monster though? Return one monster then!
+        * 4. Find next for monster with current map
+        * Penguin: less health, less speed
+        * Unicorn: More health, less speed
+        * Fox: Less health, less speed
+        * */
+        int monsterNewType = new Random().nextInt(3);
+        int monsterNewRandom = new Random().nextInt(mapWithoutMonster.size());
+        mapObject monsterNewTempObj = mapWithoutMonster.remove(monsterNewRandom);
+        System.out.println("monsternewtempobj.y: " + monsterNewTempObj.y);
+        monsterNewTempObj.monster = (monsterNewType == 0? new Penguin(monsterNewTempObj.x, monsterNewTempObj.y, monsterNewCounter, monsterNewHealth): (monsterNewType == 1? new Unicorn(monsterNewTempObj.x, monsterNewTempObj.y, monsterNewCounter, monsterNewHealth * monsterNewHealthScalar): new Fox(monsterNewTempObj.x, monsterNewTempObj.y, monsterNewCounter / monsterNewCounterScalar, monsterNewHealth)));
+        monsterNewTempObj.monster.nextAlgorithm(map, monsterNewTempObj.monster instanceof Fox);
+        System.out.println("monsternewtempobj.monster.y: " + monsterNewTempObj.monster.y);
+        return monsterNewTempObj.monster;
     }
 
     public Stack<aNode> nextAlgorithm(mapObject[][] map, boolean isFox) {
@@ -42,7 +73,6 @@ public class Monster {
 
         while (pq.isEmpty() == false && !(pq.peek().x == ARENA_SIZE - 1 && pq.peek().y == ARENA_SIZE - 1)) {
             aNode curr = pq.poll();
-            System.out.println("x: " + curr.x + " y: " + curr.y);
             for (aNode neighbour : findNeighbours(curr, aNodeSet))
                 processNeighbour(curr, neighbour, pq);
         }
@@ -66,10 +96,6 @@ public class Monster {
             neighbours[index++] = aNodeSet[curr.x][curr.y+1];
         if (curr.y - 1 >= 0  && aNodeSet[curr.x][curr.y-1].monster == null && aNodeSet[curr.x][curr.y-1].tower == null)
             neighbours[index++] = aNodeSet[curr.x][curr.y-1];
-            System.out.println("Index: " + (index));
-            for (aNode neighbour: neighbours)
-                if (neighbour != null)
-                    System.out.println("x: " + neighbour.x + " y: " + neighbour.y);
         return neighbours;
     }
 
@@ -77,8 +103,6 @@ public class Monster {
         if (curr == null || neighbour == null || pq == null)
             return;
         if (curr.fromStart + neighbour.edgeCost < neighbour.fromStart) {
-            System.out.println("curr.x: " + curr.x + " curr.y: " + curr.y + " neighbour.x: " + neighbour.x + " neighbour.y: " +neighbour.y);
-            System.out.println();
             pq.remove(neighbour);
             neighbour.fromStart = curr.fromStart + neighbour.edgeCost;
             neighbour.totalDistance = neighbour.fromStart + neighbour.minToEnd;// + (++Monster.timestamp); //for Dijkstra, mintoend always 0; for A*, intended
@@ -97,4 +121,13 @@ public class Monster {
         }
         return next;
     }
+
+    public SimpleIntegerProperty simpleXProperty() {
+        return simpleX;
+    }
+
+    public SimpleIntegerProperty simpleYProperty() {
+        return simpleY;
+    }
+
 }
