@@ -58,21 +58,23 @@ public abstract class Tower {
         return true;
     }
 
-    public static void towerNewBackFillMap(Tower newTower, int towerNewBackXFrontY, int towerNewBackYFrontX, int towerNewBackFrontSize, mapObject[][] map) {
+    public static void towerNewBackFillMap(Tower newTower, int towerNewBackXFrontY, int towerNewBackYFrontX, int towerNewBackFrontSize, mapObject[][] map, List<mapObject> mapWithoutMonster) {
         for (int i = towerNewBackXFrontY - towerNewBackFrontSize / 2; i <= towerNewBackXFrontY + towerNewBackFrontSize / 2; ++i)
             for (int j = towerNewBackYFrontX - towerNewBackFrontSize / 2; j <= towerNewBackYFrontX + towerNewBackFrontSize / 2; ++j) {
                 if (map[i][j].tower != null)
                     throw new IllegalArgumentException();
                 map[i][j].tower = newTower;
+                mapWithoutMonster.remove(map[i][j]);
             }
     }
 
-    public static void towerDelBackRemoveMap(Tower delTower, int towerDelBackFrontSize, mapObject[][] map) {
+    public static void towerDelBackRemoveMap(Tower delTower, int towerDelBackFrontSize, mapObject[][] map, List<mapObject> mapWithoutMonster) {
         for (int i = delTower.x - towerDelBackFrontSize / 2; i <= delTower.x + towerDelBackFrontSize / 2; ++i)
             for (int j = delTower.y - towerDelBackFrontSize / 2; j <= delTower.y + towerDelBackFrontSize / 2; ++j) {
                 if (map[i][j].tower == null)
                     throw new IllegalArgumentException();
                 map[i][j].tower = null;
+                mapWithoutMonster.add(map[i][j]);
             }
     }
 }

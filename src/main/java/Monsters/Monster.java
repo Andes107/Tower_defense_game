@@ -30,7 +30,6 @@ public class Monster {
         this.y = y;
         this.simpleX = new SimpleIntegerProperty(this.x);
         this.simpleY = new SimpleIntegerProperty(this.y);
-        System.out.println("this.simplY: " + simpleY.get());
         this.next = null;
         this.newNext = null;
         this.maxCounter = maxCounter;
@@ -52,10 +51,8 @@ public class Monster {
         int monsterNewType = new Random().nextInt(3);
         int monsterNewRandom = new Random().nextInt(mapWithoutMonster.size());
         mapObject monsterNewTempObj = mapWithoutMonster.remove(monsterNewRandom);
-        System.out.println("monsternewtempobj.y: " + monsterNewTempObj.y);
         monsterNewTempObj.monster = (monsterNewType == 0? new Penguin(monsterNewTempObj.x, monsterNewTempObj.y, monsterNewCounter, monsterNewHealth): (monsterNewType == 1? new Unicorn(monsterNewTempObj.x, monsterNewTempObj.y, monsterNewCounter, monsterNewHealth * monsterNewHealthScalar): new Fox(monsterNewTempObj.x, monsterNewTempObj.y, monsterNewCounter / monsterNewCounterScalar, monsterNewHealth)));
         monsterNewTempObj.monster.nextAlgorithm(map, monsterNewTempObj.monster instanceof Fox);
-        System.out.println("monsternewtempobj.monster.y: " + monsterNewTempObj.monster.y);
         return monsterNewTempObj.monster;
     }
 
