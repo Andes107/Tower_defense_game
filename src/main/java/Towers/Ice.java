@@ -13,11 +13,6 @@ public class Ice extends Tower {
                     map[this.x + dx][this.y + dy].towers.add(this);
     }
 
-    /*Copy Constructor*/
-    public Ice(Ice copyIce) {
-        super(copyIce);
-    }
-
     @Override
     public void inflictDamage(mapObject[][] map) { //assumed monster is correctly plotted on the map
         if (map == null)

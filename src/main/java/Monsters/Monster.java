@@ -37,18 +37,6 @@ public class Monster {
         this.health = health;
     }
 
-    /*Copy Constructor*/
-    public Monster(Monster copyMonster) {
-        this.x = copyMonster.x;
-        this.y = copyMonster.y;
-        this.simpleX.set(copyMonster.simpleX.get());
-        this.simpleY.set(copyMonster.simpleY.get());
-        this.maxCounter = copyMonster.maxCounter;
-        this.counter = copyMonster.counter;
-        this.health = copyMonster.health;
-
-    }
-
     public static Monster monsterNewRanGen(List<mapObject> mapWithoutMonster, mapObject[][] map, int monsterNewHealth, int monsterNewCounter, int monsterNewHealthScalar, int monsterNewCounterScalar) {
         /*
         * Objectives:
@@ -71,12 +59,7 @@ public class Monster {
     public Stack<aNode> nextAlgorithm(mapObject[][] map, boolean isFox) {
         if (map == null)
             throw new IllegalArgumentException();
-        aNode[][] aNodeSet = new aNode[ARENA_SIZE][ARENA_SIZE];
-        for (int i = 0; i < ARENA_SIZE; ++i) {
-            for (int j = 0; j < ARENA_SIZE; ++j) {
-                aNodeSet[i][j] = new aNode(map[i][j], isFox);
-            }
-        }
+        aNode[][] aNodeSet = aNode.aNodeMap(map, isFox);
         PriorityQueue<aNode> pq = new PriorityQueue<aNode>();
         pq.add(initializeStart(aNodeSet[this.x][this.y]));
 
@@ -97,13 +80,13 @@ public class Monster {
     public aNode[] findNeighbours(aNode curr, aNode[][] aNodeSet) {
         aNode[] neighbours = new aNode[4];
         int index = 0;
-        if (curr.x + 1 < ARENA_SIZE && aNodeSet[curr.x+1][curr.y].monster == null && aNodeSet[curr.x+1][curr.y].tower == null)
+        if (curr.x + 1 < ARENA_SIZE && aNodeSet[curr.x+1][curr.y].isMonster == false && aNodeSet[curr.x+1][curr.y].isTower == false)
             neighbours[index++] = aNodeSet[curr.x+1][curr.y];
-        if (curr.x - 1 >= 0 && aNodeSet[curr.x-1][curr.y].monster == null && aNodeSet[curr.x-1][curr.y].tower == null)
+        if (curr.x - 1 >= 0 && aNodeSet[curr.x-1][curr.y].isMonster == false && aNodeSet[curr.x-1][curr.y].isTower == false)
             neighbours[index++] = aNodeSet[curr.x-1][curr.y];
-        if (curr.y + 1 < ARENA_SIZE && aNodeSet[curr.x][curr.y+1].monster == null && aNodeSet[curr.x][curr.y+1].tower == null)
+        if (curr.y + 1 < ARENA_SIZE && aNodeSet[curr.x][curr.y+1].isMonster == false && aNodeSet[curr.x][curr.y+1].isTower == false)
             neighbours[index++] = aNodeSet[curr.x][curr.y+1];
-        if (curr.y - 1 >= 0  && aNodeSet[curr.x][curr.y-1].monster == null && aNodeSet[curr.x][curr.y-1].tower == null)
+        if (curr.y - 1 >= 0  && aNodeSet[curr.x][curr.y-1].isMonster == false && aNodeSet[curr.x][curr.y-1].isTower == false)
             neighbours[index++] = aNodeSet[curr.x][curr.y-1];
         return neighbours;
     }

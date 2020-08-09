@@ -20,11 +20,6 @@ public class Catapult extends Tower{
                     map[this.x + dx][this.y + dy].towers.add(this);
     }
 
-    public Catapult(Catapult copyCatapult) {
-        super(copyCatapult);
-        this.r2 = copyCatapult.r2;
-    }
-
     @Override
     public void inflictDamage(mapObject[][] map) {
         if (map == null)

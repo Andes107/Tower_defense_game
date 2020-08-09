@@ -74,6 +74,7 @@ public class gameController {
         Tower.ARENA_SIZE = this.ARENA_SIZE;
         Monster.ARENA_SIZE = this.ARENA_SIZE;
         mapObject.ARENA_SIZE = this.ARENA_SIZE;
+        aNode.ARENA_SIZE = this.ARENA_SIZE;
         basicr1 = ARENA_SIZE/2;
         basicDamage = 5;
         icer1 = ARENA_SIZE/ 2;
@@ -99,6 +100,7 @@ public class gameController {
         mapWithoutMonster = mapObject.initializeMapWithoutMonster(map);
         initializeDragRelatedEvent();
     }
+
     public void initializeDragRelatedEvent() {
         basicTower.setOnDragDetected(mouseEvent -> {
             Dragboard db = basicTower.startDragAndDrop(TransferMode.ANY);
@@ -163,10 +165,7 @@ public class gameController {
             }*/
             towerNewFrontLabel = (Label)dragEvent.getGestureSource();
             towerNewBackXFrontY = (int)(ARENA_SIZE * dragEvent.getY() / leftAnchorPane.getHeight());
-            System.out.println("towerNewBackXFrontY: " + towerNewBackXFrontY);
             towerNewBackYFrontX = (int)(ARENA_SIZE * dragEvent.getX() / leftAnchorPane.getWidth()); //this will be in the map
-            System.out.println("towerNewBackYFrontX: " + towerNewBackYFrontX);
-            System.out.println("towerNewBackFrontSize: " + towerNewDelBackFrontSize);
             dragEvent.setDropCompleted(true);
             dragEvent.consume();
         });
