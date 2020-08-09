@@ -37,6 +37,18 @@ public class Monster {
         this.health = health;
     }
 
+    /*Copy Constructor*/
+    public Monster(Monster copyMonster) {
+        this.x = copyMonster.x;
+        this.y = copyMonster.y;
+        this.simpleX.set(copyMonster.simpleX.get());
+        this.simpleY.set(copyMonster.simpleY.get());
+        this.maxCounter = copyMonster.maxCounter;
+        this.counter = copyMonster.counter;
+        this.health = copyMonster.health;
+
+    }
+
     public static Monster monsterNewRanGen(List<mapObject> mapWithoutMonster, mapObject[][] map, int monsterNewHealth, int monsterNewCounter, int monsterNewHealthScalar, int monsterNewCounterScalar) {
         /*
         * Objectives:

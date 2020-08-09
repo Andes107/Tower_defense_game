@@ -12,6 +12,11 @@ public class DeathStar extends Tower{
             throw new NullPointerException();
     }
 
+    /*Copy Constructor*/
+    public DeathStar(DeathStar copyDeathStar) {
+        super(copyDeathStar);
+    }
+
     @Override
     public void inflictDamage(mapObject[][] map) {
         if (map == null)

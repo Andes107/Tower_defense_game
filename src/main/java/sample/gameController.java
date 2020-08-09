@@ -45,7 +45,7 @@ public class gameController {
     /*=======towerNew Starts=======*/
     private int towerNewBackXFrontY;
     private int towerNewBackYFrontX;
-    private int towerNewBackFrontSize;
+    private int towerNewDelBackFrontSize;
     private Label towerNewFrontLabel;
     /*=======towerDel Starts=======*/
     private ImageView towerDelFrontImgView;
@@ -55,10 +55,14 @@ public class gameController {
     private int monsterNewHealthScalar;
     private int monsterNewCounterScalar;
 
+    /*=======tower utility=======*/
     private HashMap<Tower, ImageView> towerToImageMap;
+        /*Objective: for towerDel*/
     private HashMap<ImageView, Tower> imageToTowerMap;
+    /*=======monster utility=======*/
     private HashMap<Monster, ImageView> monsterToImageMap;
     private HashMap<ImageView, Monster> imageToMonsterMap;
+    /*=======mapObject utility=======*/
     private mapObject[][] map;
     private List<mapObject> mapWithoutMonster;
 
@@ -69,15 +73,16 @@ public class gameController {
         ARENA_SIZE = 25;
         Tower.ARENA_SIZE = this.ARENA_SIZE;
         Monster.ARENA_SIZE = this.ARENA_SIZE;
-        basicr1 = 5;
+        mapObject.ARENA_SIZE = this.ARENA_SIZE;
+        basicr1 = ARENA_SIZE/2;
         basicDamage = 5;
-        icer1 = 5;
+        icer1 = ARENA_SIZE/ 2;
         iceBump = 5;
         deathStarDamage = 10;
         catapultr1 = 5;
-        catapultr2 = 10;
+        catapultr2 = 15;
         catapultDamage = 10;
-        towerNewBackFrontSize = 5;
+        towerNewDelBackFrontSize = 5;
         towerNewFrontLabel = null;
         towerDelFrontImgView = null;
         monsterNewHealth = 10;
@@ -88,22 +93,12 @@ public class gameController {
         imageToTowerMap = new HashMap<ImageView, Tower>();
         monsterToImageMap = new HashMap<Monster, ImageView>();
         imageToMonsterMap = new HashMap<ImageView, Monster>();
-        mapWithoutMonster = new Vector<mapObject>();
         towerNewBackXFrontY = -1;
         towerNewBackYFrontX = -1;
-        initializeMap();
+        map = mapObject.initializeMap();
+        mapWithoutMonster = mapObject.initializeMapWithoutMonster(map);
         initializeDragRelatedEvent();
     }
-
-    public void initializeMap() {
-        map = new mapObject[ARENA_SIZE] [ARENA_SIZE];
-        for (int i = 0; i < ARENA_SIZE; ++i)
-            for (int j = 0; j < ARENA_SIZE; ++j) {
-                map[i][j] = new mapObject(i, j, null, null);
-                mapWithoutMonster.add(map[i][j]);
-            }
-    }
-
     public void initializeDragRelatedEvent() {
         basicTower.setOnDragDetected(mouseEvent -> {
             Dragboard db = basicTower.startDragAndDrop(TransferMode.ANY);
@@ -168,7 +163,10 @@ public class gameController {
             }*/
             towerNewFrontLabel = (Label)dragEvent.getGestureSource();
             towerNewBackXFrontY = (int)(ARENA_SIZE * dragEvent.getY() / leftAnchorPane.getHeight());
+            System.out.println("towerNewBackXFrontY: " + towerNewBackXFrontY);
             towerNewBackYFrontX = (int)(ARENA_SIZE * dragEvent.getX() / leftAnchorPane.getWidth()); //this will be in the map
+            System.out.println("towerNewBackYFrontX: " + towerNewBackYFrontX);
+            System.out.println("towerNewBackFrontSize: " + towerNewDelBackFrontSize);
             dragEvent.setDropCompleted(true);
             dragEvent.consume();
         });
@@ -177,30 +175,14 @@ public class gameController {
     @FXML
     public void nextFrame(ActionEvent actionEvent) {
         gameLoop();
-//        printMap();
-    }
-
-    public void printMap() {
-        for (int i = 0; i < ARENA_SIZE; ++i) {
-            for (int j = 0; j < ARENA_SIZE; ++j)
-                System.out.print((map[i][j].tower != null) + " ");
-            System.out.println();
-        }
-
-        System.out.println();
-
-        for (int i = 0; i < ARENA_SIZE; ++i) {
-            for (int j = 0; j < ARENA_SIZE; ++j)
-                System.out.print(map[i][j].towers.size() + " ");
-            System.out.println();
-        }
     }
 
     public void gameLoop() {
-        Tower.towerInflictDamage(towerToImageMap.keySet(), map);
+        Tower.towerDamageBack(towerToImageMap.keySet(), map);
         towerNew();
         towerDel();
         monsterNewRanGen();
+//        printmap();
         /*
         * towerUp(); Remark: Stuck in UI design, will come back later after some concrete work is done here.
         * checkCuasalty();
@@ -208,13 +190,47 @@ public class gameController {
         * */
     }
 
+    public void printmap() {
+/*        System.out.println("Is there tower?");
+        for (int i = 0; i < ARENA_SIZE; ++i) {
+            for (int j = 0; j < ARENA_SIZE; ++j) {
+                int x = (map[i][j].tower != null? 1 : 0);
+                if (map[i][j].tower != null && map[i][j].tower.x == i && map[i][j].tower.y == j)
+                    System.out.print((x + 1) +  " ");
+                else
+                    System.out.print(x + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+        System.out.println("Kill Zone");
+        for (int i = 0; i < ARENA_SIZE; ++i) {
+            for (int j = 0; j < ARENA_SIZE; ++j)
+                System.out.print(map[i][j].towers.size() + " ");
+            System.out.println();
+        }*/
+        System.out.println();
+        System.out.println("Monster exists");
+        for (int i = 0; i < ARENA_SIZE; ++i) {
+            for (int j = 0; j < ARENA_SIZE; ++j)
+                System.out.print((map[i][j].monster == null? 0 : 1) + " ");
+            System.out.println();
+        }
+
+    }
+
     public void towerNew() {
-        if (Tower.towerNewBackMapAva(towerNewBackXFrontY, towerNewBackYFrontX, towerNewBackFrontSize, map) && towerNewFrontIsNew()) {
+        if (Tower.towerNewBackMapAva(towerNewBackXFrontY, towerNewBackYFrontX, towerNewDelBackFrontSize, map) && towerNewFrontIsNew()) {
             Tower towerNewTempTower = towerNewGenTower();
-            Tower.towerNewBackFillMap(towerNewTempTower, towerNewBackXFrontY, towerNewBackYFrontX, towerNewBackFrontSize, map, mapWithoutMonster);
+            Tower.towerNewBackFillMapTower(towerNewTempTower, towerNewBackXFrontY, towerNewBackYFrontX, towerNewDelBackFrontSize, map, mapWithoutMonster);
             towerNewFrontHashUpdate(towerNewTempTower, towerNewFrontGenImgView());
             towerNewFrontRestore();
-        }
+        }/*
+        System.out.println("monstertoimagemap.keyset().size() : " + monsterToImageMap.keySet().size());
+        for (Monster monster : monsterToImageMap.keySet()) {
+            System.out.println("newNext: " + (monster.newNext == null));
+            System.out.println("next: " + (monster.next == null));
+        }*/
     }
 
     public boolean towerNewFrontIsNew() {
@@ -242,10 +258,10 @@ public class gameController {
             frontEndTower = new ImageView(new Image(getClass().getResourceAsStream("/deathStar.png")));
         else
             frontEndTower = new ImageView(new Image(getClass().getResourceAsStream("/catapult.png")));
-        frontEndTower.fitWidthProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE).multiply(towerNewBackFrontSize));
-        frontEndTower.fitHeightProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE).multiply(towerNewBackFrontSize));
-        frontEndTower.xProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE).multiply(towerNewBackYFrontX - towerNewBackFrontSize /2));
-        frontEndTower.yProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE).multiply(towerNewBackXFrontY - towerNewBackFrontSize /2));
+        frontEndTower.fitWidthProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE).multiply(towerNewDelBackFrontSize));
+        frontEndTower.fitHeightProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE).multiply(towerNewDelBackFrontSize));
+        frontEndTower.xProperty().bind(leftAnchorPane.widthProperty().divide(ARENA_SIZE).multiply(towerNewBackYFrontX - towerNewDelBackFrontSize /2));
+        frontEndTower.yProperty().bind(leftAnchorPane.heightProperty().divide(ARENA_SIZE).multiply(towerNewBackXFrontY - towerNewDelBackFrontSize /2));
         frontEndTower.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) {
                 upgradeTower = (ImageView) (event.getSource());
@@ -269,14 +285,13 @@ public class gameController {
     }
 
     public void towerDel() {
-        if (towerDelFrontImgView == null) {
-            return;
-        }
+        if (towerDelFrontImgView != null) {
         towerDelFrontDelImgView();
-        Tower.towerDelBackRemoveMap(imageToTowerMap.get(towerDelFrontImgView), towerNewBackFrontSize, map, mapWithoutMonster);
+        Tower.towerDelBackRemoveMapTower(imageToTowerMap.get(towerDelFrontImgView), towerNewDelBackFrontSize, map, mapWithoutMonster);
         imageToTowerMap.get(towerDelFrontImgView).towerDelBackRemoveKillZone(map);
         towerDelFrontHashDel();
         towerDelFrontRestore();
+        }
     }
 
     public void towerDelFrontDelImgView() {
@@ -294,9 +309,12 @@ public class gameController {
     }
 
     public void monsterNewRanGen() {
+        if (mapWithoutMonster.size() != 0) {
         Monster monsterNewTempMon = Monster.monsterNewRanGen(mapWithoutMonster, map,  monsterNewHealth, monsterNewCounter, monsterNewHealthScalar, monsterNewCounterScalar);
         ImageView monsterNewTempImg = monsterNewFrontGenImgView(monsterNewTempMon);
         monsterNewFrontHashUpdate(monsterNewTempMon, monsterNewTempImg);
+        }
+
     }
 
     public ImageView monsterNewFrontGenImgView(Monster monsterNewTemp) {

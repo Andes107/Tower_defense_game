@@ -3,11 +3,10 @@ package MapObject;
 import Monsters.*;
 import Towers.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class mapObject{ //seems at the end it will be bottom to top
-    public static final int ARENA_SIZE = 5;
+    public static int ARENA_SIZE;
     public int x;
     public int y;
     public Monster monster; //There will only be 1 monster
@@ -23,4 +22,29 @@ public class mapObject{ //seems at the end it will be bottom to top
         this.towers = new ArrayList<Tower>();
     }
 
+    /*Copy constructor*/
+    public mapObject(mapObject copyMapObject) {
+        this.x = copyMapObject.x;
+        this.y = copyMapObject.y;
+        this.monster = copyMapObject.monster;
+        this.tower = copyMapObject.tower;
+        this.towers = new ArrayList<Tower>(copyMapObject.towers);
+    }
+
+    public static mapObject[][] initializeMap() {
+        mapObject[][] map = new mapObject[ARENA_SIZE] [ARENA_SIZE];
+        for (int i = 0; i < ARENA_SIZE; ++i)
+            for (int j = 0; j < ARENA_SIZE; ++j)
+                map[i][j] = new mapObject(i, j, null, null);
+        return map;
+    }
+
+    public static Vector<mapObject> initializeMapWithoutMonster(mapObject[][] map) {
+        Vector<mapObject> mapWithoutMonster = new Vector<mapObject>();
+        for (int i = 0; i < ARENA_SIZE; ++i)
+            for (int j = 0; j < ARENA_SIZE; ++j)
+                if (!(i == ARENA_SIZE - 1 && j == ARENA_SIZE - 1))
+                    mapWithoutMonster.add(map[i][j]);
+        return mapWithoutMonster;
+    }
 }

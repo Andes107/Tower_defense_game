@@ -28,6 +28,15 @@ public abstract class Tower {
         this.bump = bump;
     }
 
+    /*Copy constructor*/
+    public Tower(Tower copyTower) {
+        this.x = copyTower.x;
+        this.y = copyTower.y;
+        this.r1 = copyTower.r1;
+        this.damage = copyTower.damage;
+        this.bump = copyTower.bump;
+    }
+
     public abstract void inflictDamage(mapObject[][] map);
 
     public abstract void towerDelBackRemoveKillZone(mapObject[][] map);
@@ -45,7 +54,7 @@ public abstract class Tower {
         return trueIndex;
     }
 
-    public static void towerInflictDamage(Set<Tower> towerFromController, mapObject[][] mapFromController) {
+    public static void towerDamageBack(Set<Tower> towerFromController, mapObject[][] mapFromController) {
         for (Tower tower : towerFromController)
             tower.inflictDamage(mapFromController);
     }
@@ -58,7 +67,7 @@ public abstract class Tower {
         return true;
     }
 
-    public static void towerNewBackFillMap(Tower newTower, int towerNewBackXFrontY, int towerNewBackYFrontX, int towerNewBackFrontSize, mapObject[][] map, List<mapObject> mapWithoutMonster) {
+    public static void towerNewBackFillMapTower(Tower newTower, int towerNewBackXFrontY, int towerNewBackYFrontX, int towerNewBackFrontSize, mapObject[][] map, List<mapObject> mapWithoutMonster) {
         for (int i = towerNewBackXFrontY - towerNewBackFrontSize / 2; i <= towerNewBackXFrontY + towerNewBackFrontSize / 2; ++i)
             for (int j = towerNewBackYFrontX - towerNewBackFrontSize / 2; j <= towerNewBackYFrontX + towerNewBackFrontSize / 2; ++j) {
                 if (map[i][j].tower != null)
@@ -68,7 +77,7 @@ public abstract class Tower {
             }
     }
 
-    public static void towerDelBackRemoveMap(Tower delTower, int towerDelBackFrontSize, mapObject[][] map, List<mapObject> mapWithoutMonster) {
+    public static void towerDelBackRemoveMapTower(Tower delTower, int towerDelBackFrontSize, mapObject[][] map, List<mapObject> mapWithoutMonster) {
         for (int i = delTower.x - towerDelBackFrontSize / 2; i <= delTower.x + towerDelBackFrontSize / 2; ++i)
             for (int j = delTower.y - towerDelBackFrontSize / 2; j <= delTower.y + towerDelBackFrontSize / 2; ++j) {
                 if (map[i][j].tower == null)
