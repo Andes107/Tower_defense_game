@@ -39,8 +39,8 @@ public class gameController {
     /*In the following, commented are variables in controller*/
     /*Basic.java: x,y*/private int basicr1; private int basicDamage; /*Basic.java map*/
     /*Ice.java: x,y*/private int icer1; private int iceBump; /*Ice.java map*/
-    /*DeathStar.java: x,y, r1: ARENA_SIZE*/private int deathStarDamage; /*DeathStar.java map*/
-    /*Catapult.java: x,y*/private int catapultr1; private int catapultDamage; private int catapultr2; /*Catapult.java map*/
+    /*DeathStar.java: x,y, r1: ARENA_SIZE*/private int deathStarDamage; private int deathStarFallOut;/*DeathStar.java map*/
+    /*Catapult.java: x,y*/private int catapultr1; private int catapultDamage; private int catapultr2; private int catapultir;/*Catapult.java map*/
 
     /*=======towerNew Starts=======*/
     private int towerNewBackXFrontY;
@@ -55,16 +55,13 @@ public class gameController {
     private int monsterNewHealthScalar;
     private int monsterNewCounterScalar;
 
-    /*=======tower utility=======*/
-    private HashMap<Tower, ImageView> towerToImageMap;
-        /*Objective: for towerDel*/
+    /*Objective: for towerDel*/
     private HashMap<ImageView, Tower> imageToTowerMap;
     /*=======monster utility=======*/
     private HashMap<Monster, ImageView> monsterToImageMap;
-    private HashMap<ImageView, Monster> imageToMonsterMap;
+    private List<mapObject> mapWithoutMonster;
     /*=======mapObject utility=======*/
     private mapObject[][] map;
-    private List<mapObject> mapWithoutMonster;
 
     private ImageView upgradeTower;
 
@@ -80,9 +77,11 @@ public class gameController {
         icer1 = ARENA_SIZE/ 2;
         iceBump = 5;
         deathStarDamage = 10;
+        deathStarFallOut = 2;
         catapultr1 = 5;
         catapultr2 = 15;
         catapultDamage = 10;
+        catapultir = 2;
         towerNewDelBackFrontSize = 5;
         towerNewFrontLabel = null;
         towerDelFrontImgView = null;
@@ -90,10 +89,10 @@ public class gameController {
         monsterNewCounter = 4;
         monsterNewHealthScalar = 2;
         monsterNewCounterScalar = 2;
-        towerToImageMap = new HashMap<Tower, ImageView>();
+
         imageToTowerMap = new HashMap<ImageView, Tower>();
         monsterToImageMap = new HashMap<Monster, ImageView>();
-        imageToMonsterMap = new HashMap<ImageView, Monster>();
+
         towerNewBackXFrontY = -1;
         towerNewBackYFrontX = -1;
         map = mapObject.initializeMap();
@@ -177,63 +176,112 @@ public class gameController {
     }
 
     public void gameLoop() {
-        Tower.towerDamageBack(towerToImageMap.keySet(), map);
-        towerNew();
+        Tower.towerDamageBack(imageToTowerMap.values(), map);
         towerDel();
+        towerNew();
+        monsterNextMove();
         monsterNewRanGen();
-//        printmap();
         /*
         * towerUp(); Remark: Stuck in UI design, will come back later after some concrete work is done here.
-        * checkCuasalty();
-        * monsterNextMove();
         * */
     }
 
-    public void printmap() {
-/*        System.out.println("Is there tower?");
-        for (int i = 0; i < ARENA_SIZE; ++i) {
-            for (int j = 0; j < ARENA_SIZE; ++j) {
-                int x = (map[i][j].tower != null? 1 : 0);
-                if (map[i][j].tower != null && map[i][j].tower.x == i && map[i][j].tower.y == j)
-                    System.out.print((x + 1) +  " ");
-                else
-                    System.out.print(x + " ");
-            }
-            System.out.println();
+    /*
+    * Objective:
+    * 1. Remove the image in front end
+    * 2. Remove the tower square for map in back end
+    * 3. Add back the available mapObject into mapWithoutMonster
+    * 3. Remove the towers kill zone for map in back end
+    * 4. Remove the hashmap that contains the tower and image pair
+    * 5. Restore the imageview that store to delete
+    * */
+    public void towerDel() {
+        if (towerDelFrontImgView != null) {
+        towerDelFrontDelImgView();
+        Tower.towerDelBackRemoveMapTower(imageToTowerMap.get(towerDelFrontImgView), towerNewDelBackFrontSize, map, mapWithoutMonster);
+        imageToTowerMap.get(towerDelFrontImgView).towerDelBackRemoveKillZone(map);
+        towerDelFrontHashDel();
+        towerDelFrontRestore();
         }
-        System.out.println();
-        System.out.println("Kill Zone");
-        for (int i = 0; i < ARENA_SIZE; ++i) {
-            for (int j = 0; j < ARENA_SIZE; ++j)
-                System.out.print(map[i][j].towers.size() + " ");
-            System.out.println();
-        }*/
-        System.out.println();
-        System.out.println("Monster exists");
-        for (int i = 0; i < ARENA_SIZE; ++i) {
-            for (int j = 0; j < ARENA_SIZE; ++j)
-                System.out.print((map[i][j].monster == null? 0 : 1) + " ");
-            System.out.println();
-        }
-
     }
 
+    public void towerDelFrontDelImgView() {
+        leftAnchorPane.getChildren().remove(towerDelFrontImgView);
+    }
+
+    public void towerDelFrontHashDel() {
+        imageToTowerMap.remove(towerDelFrontImgView);
+    }
+
+    public void towerDelFrontRestore() {
+        towerDelFrontImgView = null;
+    }
+
+    public void monsterNextMove() {
+        Set<Monster> itrSet = monsterToImageMap.keySet();
+        Iterator<Monster> itr = monsterToImageMap.keySet().iterator();
+        for (Monster monster : itrSet) {
+            if (monster.health <= 0) {
+                leftAnchorPane.getChildren().remove(monsterToImageMap.get(monster));
+                System.out.println(monsterToImageMap.remove(monster).getX());
+                map[monster.x][monster.y].monster = null;
+                mapWithoutMonster.add(map[monster.x][monster.y]);
+                continue;
+            }
+            if ((monster.counter--) == 0) {
+                aNode nextMove = monster.next.pop();
+                map[monster.x][monster.y].monster = null;
+                mapWithoutMonster.add(map[monster.x][monster.y]);
+                mapWithoutMonster.remove(map[nextMove.x][nextMove.y]);
+                monster.x = nextMove.x;
+                monster.y = nextMove.y;
+                monster.simpleX.set(monster.x);
+                monster.simpleY.set(monster.y);
+            }
+        }
+    }
+
+    /*
+    * Objective:
+    * 1. Gauge is there any new tower request
+    * 2. Gauge is the backend map free for new tower square
+    * 3. Gauge will the new tower square block any monster
+    * 4. Update all monster's next if all the above are true
+    * 5. Update the appropriate hashmap if all the above are true
+    * 6. Remove the tower square if any above are false
+    * 7. Remove the tower kill zone if any above are false
+    * */
     public void towerNew() {
         if (Tower.towerNewBackMapAva(towerNewBackXFrontY, towerNewBackYFrontX, towerNewDelBackFrontSize, map) && towerNewFrontIsNew()) {
             Tower towerNewTempTower = towerNewGenTower();
-            Tower.towerNewBackFillMapTower(towerNewTempTower, towerNewBackXFrontY, towerNewBackYFrontX, towerNewDelBackFrontSize, map, mapWithoutMonster);
-            towerNewFrontHashUpdate(towerNewTempTower, towerNewFrontGenImgView());
+            Tower.towerNewBackFillMapTower(towerNewTempTower, towerNewDelBackFrontSize, map, mapWithoutMonster);
+            if (towerNewIsNotBlocked() == true) { //the tower can formally be added, monsters use new next stuff
+                towerNewFrontHashUpdate(towerNewTempTower, towerNewFrontGenImgView());
+                towerNewMonUpdate();
+            } else {
+                Tower.towerDelBackRemoveMapTower(towerNewTempTower, towerNewDelBackFrontSize, map, mapWithoutMonster);
+                towerNewTempTower.towerDelBackRemoveKillZone(map);
+            }
             towerNewFrontRestore();
-        }/*
-        System.out.println("monstertoimagemap.keyset().size() : " + monsterToImageMap.keySet().size());
-        for (Monster monster : monsterToImageMap.keySet()) {
-            System.out.println("newNext: " + (monster.newNext == null));
-            System.out.println("next: " + (monster.next == null));
-        }*/
+        }
     }
 
     public boolean towerNewFrontIsNew() {
         return (towerNewFrontLabel != null && towerNewBackXFrontY != -1 && towerNewBackYFrontX != -1);
+    }
+
+    public boolean towerNewIsNotBlocked() {
+        for (Monster monster : monsterToImageMap.keySet())
+            if ((monster.newNext = monster.nextAlgorithm(map, monster instanceof Fox)) == null)
+                return false;
+        return true;
+    }
+
+    public void towerNewMonUpdate() {
+        for (Monster monster : monsterToImageMap.keySet()) {
+            monster.next = monster.newNext;
+            monster.newNext = null;
+        }
     }
 
     public Tower towerNewGenTower() {
@@ -242,9 +290,9 @@ public class gameController {
          else if (towerNewFrontLabel == iceTower)
             return new Ice(towerNewBackXFrontY, towerNewBackYFrontX, icer1, iceBump,map);
         else if (towerNewFrontLabel == deathStar)
-            return new DeathStar(towerNewBackXFrontY, towerNewBackYFrontX, ARENA_SIZE, deathStarDamage,map);
+            return new DeathStar(towerNewBackXFrontY, towerNewBackYFrontX, ARENA_SIZE, deathStarDamage, deathStarFallOut,map);
         else
-            return new Catapult(towerNewBackXFrontY, towerNewBackYFrontX, catapultr1, catapultDamage, catapultr2,map);
+            return new Catapult(towerNewBackXFrontY, towerNewBackYFrontX, catapultr1, catapultDamage, catapultr2, catapultir,map);
     }
 
     public ImageView towerNewFrontGenImgView() {
@@ -273,7 +321,6 @@ public class gameController {
     }
 
     public void towerNewFrontHashUpdate(Tower backendTower, ImageView frontendTowerImageView) {
-        towerToImageMap.put(backendTower,frontendTowerImageView);
         imageToTowerMap.put(frontendTowerImageView,backendTower);
     }
 
@@ -283,37 +330,12 @@ public class gameController {
         towerNewBackYFrontX = -1;
     }
 
-    public void towerDel() {
-        if (towerDelFrontImgView != null) {
-        towerDelFrontDelImgView();
-        Tower.towerDelBackRemoveMapTower(imageToTowerMap.get(towerDelFrontImgView), towerNewDelBackFrontSize, map, mapWithoutMonster);
-        imageToTowerMap.get(towerDelFrontImgView).towerDelBackRemoveKillZone(map);
-        towerDelFrontHashDel();
-        towerDelFrontRestore();
-        }
-    }
-
-    public void towerDelFrontDelImgView() {
-        leftAnchorPane.getChildren().remove(towerDelFrontImgView);
-    }
-
-    public void towerDelFrontHashDel() {
-        Tower tempDelTower = imageToTowerMap.get(towerDelFrontImgView);
-        imageToTowerMap.remove(towerDelFrontImgView);
-        towerToImageMap.remove(tempDelTower);
-    }
-
-    public void towerDelFrontRestore() {
-        towerDelFrontImgView = null;
-    }
-
     public void monsterNewRanGen() {
         if (mapWithoutMonster.size() != 0) {
-        Monster monsterNewTempMon = Monster.monsterNewRanGen(mapWithoutMonster, map,  monsterNewHealth, monsterNewCounter, monsterNewHealthScalar, monsterNewCounterScalar);
-        ImageView monsterNewTempImg = monsterNewFrontGenImgView(monsterNewTempMon);
-        monsterNewFrontHashUpdate(monsterNewTempMon, monsterNewTempImg);
+            Monster monsterNewTempMon = Monster.monsterNewRanGen(mapWithoutMonster, map,  monsterNewHealth, monsterNewCounter, monsterNewHealthScalar, monsterNewCounterScalar);
+            ImageView monsterNewTempImg = monsterNewFrontGenImgView(monsterNewTempMon);
+            monsterNewFrontHashUpdate(monsterNewTempMon, monsterNewTempImg);
         }
-
     }
 
     public ImageView monsterNewFrontGenImgView(Monster monsterNewTemp) {
@@ -334,6 +356,5 @@ public class gameController {
 
     public void monsterNewFrontHashUpdate(Monster monsterNewTempMon, ImageView monsterNewTempImg) {
         monsterToImageMap.put(monsterNewTempMon, monsterNewTempImg);
-        imageToMonsterMap.put(monsterNewTempImg, monsterNewTempMon);
     }
 }

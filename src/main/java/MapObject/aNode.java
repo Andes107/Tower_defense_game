@@ -13,7 +13,7 @@ public class aNode /*extends mapObject */implements Comparable<aNode>{
 
     public int edgeCost; //isFox: 1, notFox: maxDamage; fixed
     public int fromStart; //assumed infinity for both cases; meaningful for both true and false
-    public int minToEnd; //isFox: d(A-x,A-y), notFox: 0; fixed
+    public int minToEnd; //notFox: d(A-x,A-y), isFox: 0; fixed
     public int totalDistance; //assumed infinity for both cases; meaningless for Dijkstra while account for minToEnd for fox
     public aNode prev;
 

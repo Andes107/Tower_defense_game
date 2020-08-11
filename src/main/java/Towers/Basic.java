@@ -23,6 +23,7 @@ public class Basic extends Tower {
                 if (this.x + dx >= 0 && this.x + dx < ARENA_SIZE && this.y + dy >= 0 && this.y + dy < ARENA_SIZE && map[this.x + dx][this.y + dy].monster != null && Math.hypot(ARENA_SIZE - map[this.x + dx][this.y + dy].monster.x, ARENA_SIZE - map[this.x + dx][this.y + dy].monster.y) < Math.hypot(ARENA_SIZE - victim.x, ARENA_SIZE - victim.y))
                     victim = map[this.x + dx][this.y + dy].monster;
         victim.health -= this.damage;
+//        System.out.println("Basic inflicted: (" + victim.x + ", " + victim.y + " )");
     }
 
     @Override

@@ -52,7 +52,8 @@ public class Monster {
         int monsterNewRandom = new Random().nextInt(mapWithoutMonster.size());
         mapObject monsterNewTempObj = mapWithoutMonster.remove(monsterNewRandom);
         monsterNewTempObj.monster = (monsterNewType == 0? new Penguin(monsterNewTempObj.x, monsterNewTempObj.y, monsterNewCounter, monsterNewHealth): (monsterNewType == 1? new Unicorn(monsterNewTempObj.x, monsterNewTempObj.y, monsterNewCounter, monsterNewHealth * monsterNewHealthScalar): new Fox(monsterNewTempObj.x, monsterNewTempObj.y, monsterNewCounter / monsterNewCounterScalar, monsterNewHealth)));
-        monsterNewTempObj.monster.nextAlgorithm(map, monsterNewTempObj.monster instanceof Fox);
+        System.out.println("(map[monsterNewTempObj.x][monsterNewTempObj.y].monster == monsterNewTempObj.monster)" + (map[monsterNewTempObj.x][monsterNewTempObj.y].monster == monsterNewTempObj.monster));
+        monsterNewTempObj.monster.next = monsterNewTempObj.monster.nextAlgorithm(map, monsterNewTempObj.monster instanceof Fox);
         return monsterNewTempObj.monster;
     }
 
@@ -60,9 +61,9 @@ public class Monster {
         if (map == null)
             throw new IllegalArgumentException();
         aNode[][] aNodeSet = aNode.aNodeMap(map, isFox);
+
         PriorityQueue<aNode> pq = new PriorityQueue<aNode>();
         pq.add(initializeStart(aNodeSet[this.x][this.y]));
-
         while (pq.isEmpty() == false && !(pq.peek().x == ARENA_SIZE - 1 && pq.peek().y == ARENA_SIZE - 1)) {
             aNode curr = pq.poll();
             for (aNode neighbour : findNeighbours(curr, aNodeSet))
@@ -95,6 +96,7 @@ public class Monster {
         if (curr == null || neighbour == null || pq == null)
             return;
         if (curr.fromStart + neighbour.edgeCost < neighbour.fromStart) {
+/*            System.out.println("From: (" + curr.x + ", " + curr.y + ") -> (" + neighbour.x + ", " + neighbour.y + ")");*/
             pq.remove(neighbour);
             neighbour.fromStart = curr.fromStart + neighbour.edgeCost;
             neighbour.totalDistance = neighbour.fromStart + neighbour.minToEnd;// + (++Monster.timestamp); //for Dijkstra, mintoend always 0; for A*, intended

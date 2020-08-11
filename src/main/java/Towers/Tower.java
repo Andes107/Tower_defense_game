@@ -4,10 +4,7 @@ import MapObject.mapObject;
 import Monsters.Monster;
 import org.graalvm.compiler.nodes.calc.IsNullNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public abstract class Tower {
     public static int ARENA_SIZE;
@@ -54,7 +51,7 @@ public abstract class Tower {
         return trueIndex;
     }
 
-    public static void towerDamageBack(Set<Tower> towerFromController, mapObject[][] mapFromController) {
+    public static void towerDamageBack(Collection<Tower> towerFromController, mapObject[][] mapFromController) {
         for (Tower tower : towerFromController)
             tower.inflictDamage(mapFromController);
     }
@@ -67,9 +64,9 @@ public abstract class Tower {
         return true;
     }
 
-    public static void towerNewBackFillMapTower(Tower newTower, int towerNewBackXFrontY, int towerNewBackYFrontX, int towerNewBackFrontSize, mapObject[][] map, List<mapObject> mapWithoutMonster) {
-        for (int i = towerNewBackXFrontY - towerNewBackFrontSize / 2; i <= towerNewBackXFrontY + towerNewBackFrontSize / 2; ++i)
-            for (int j = towerNewBackYFrontX - towerNewBackFrontSize / 2; j <= towerNewBackYFrontX + towerNewBackFrontSize / 2; ++j) {
+    public static void towerNewBackFillMapTower(Tower newTower, int towerNewBackFrontSize, mapObject[][] map, List<mapObject> mapWithoutMonster) {
+        for (int i = newTower.x - towerNewBackFrontSize / 2; i <= newTower.x + towerNewBackFrontSize / 2; ++i)
+            for (int j = newTower.y - towerNewBackFrontSize / 2; j <= newTower.y + towerNewBackFrontSize / 2; ++j) {
                 if (map[i][j].tower != null)
                     throw new IllegalArgumentException();
                 map[i][j].tower = newTower;
