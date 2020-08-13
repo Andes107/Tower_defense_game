@@ -1,6 +1,10 @@
 package sample;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -12,6 +16,7 @@ import javafx.scene.layout.*;
 import Monsters.*;
 import Towers.*;
 import MapObject.*;
+import javafx.util.Duration;
 
 import java.util.*;
 
@@ -22,7 +27,7 @@ public class gameController {
     private AnchorPane leftAnchorPane;
 
     @FXML
-    private AnchorPane rightAnchorPane;
+    private Button Next;
 
     @FXML
     private Label basicTower;
@@ -66,6 +71,10 @@ public class gameController {
 
     private ImageView upgradeTower;
 
+    private Timeline timeline;
+
+    private boolean debug = false;
+
     @FXML
     public void initialize() {
         ARENA_SIZE = 25;
@@ -99,6 +108,10 @@ public class gameController {
         map = mapObject.initializeMap();
         mapWithoutMonster = mapObject.initializeMapWithoutMonster(map);
         initializeDragRelatedEvent();
+        timeline = new Timeline(new KeyFrame(Duration.millis(1000), e -> {
+            gameLoop();
+        }));
+        timeline.setCycleCount(Animation.INDEFINITE);
     }
 
     public void initializeDragRelatedEvent() {
@@ -173,6 +186,7 @@ public class gameController {
 
     @FXML
     public void nextFrame(ActionEvent actionEvent) {
+        timeline.play();
         gameLoop();
     }
 
@@ -180,8 +194,12 @@ public class gameController {
         Tower.towerDamageBack(imageToTowerMap.values(), map);
         towerDel();
         towerNew();
-        if (monsterNextMove() == true)
-            Platform.exit();
+        if (monsterNextMove() == true) {
+            System.out.println("It should be done here!!!");
+            timeline.stop();
+            Next.setDisable(true);
+            return;
+        }
         monsterNewRanGen();
         /*
         * towerUp(); Remark: Stuck in UI design, will come back later after some concrete work is done here.
@@ -229,8 +247,11 @@ public class gameController {
             * 2. It dies
             * 3. Not any of the above
             * */
-            if (monsterNextCurr.x == (ARENA_SIZE - 1) && monsterNextCurr.y == (ARENA_SIZE - 1))
+            if (monsterNextCurr.x == (ARENA_SIZE - 1) && monsterNextCurr.y == (ARENA_SIZE - 1)) {
+                System.out.println("Someone reached the target");
+                debug = true;
                 return true;
+            }
             if (monsterNextCurr.health <= 0) {
                 leftAnchorPane.getChildren().remove(monsterToImageMap.get(monsterNextCurr));
                 map[monsterNextCurr.x][monsterNextCurr.y].monster = null;
@@ -238,7 +259,7 @@ public class gameController {
                 monsterNextItr.remove();
                 continue;
             }
-            if (monsterNextCurr.next.isEmpty() == false && map[monsterNextCurr.next.peek().x][monsterNextCurr.next.peek().y].monster == null && (monsterNextCurr.counter--) == 0) {
+            if (map[monsterNextCurr.next.peek().x][monsterNextCurr.next.peek().y].monster == null /*&& (monsterNextCurr.counter--) == 0*/) {
                 monsterNextCurr.counter = monsterNextCurr.maxCounter;
                 mapWithoutMonster.remove(map[monsterNextCurr.x][monsterNextCurr.y]);
                 map[monsterNextCurr.x][monsterNextCurr.y].monster = null;
@@ -344,7 +365,7 @@ public class gameController {
     }
 
     public void monsterNewRanGen() {
-        if (mapWithoutMonster.size() != 0) {
+        if (mapWithoutMonster.size() != 0 && map[ARENA_SIZE - 1][ARENA_SIZE - 1].monster == null) {
             Monster monsterNewTempMon = Monster.monsterNewRanGen(mapWithoutMonster, map,  monsterNewHealth, monsterNewCounter, monsterNewHealthScalar, monsterNewCounterScalar);
             ImageView monsterNewTempImg = monsterNewFrontGenImgView(monsterNewTempMon);
             monsterNewFrontHashUpdate(monsterNewTempMon, monsterNewTempImg);

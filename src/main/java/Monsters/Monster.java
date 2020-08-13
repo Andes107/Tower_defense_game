@@ -68,7 +68,17 @@ public class Monster {
             for (aNode neighbour : findNeighbours(curr, aNodeSet))
                 processNeighbour(curr, neighbour, pq);
         }
-        return createStack(aNodeSet[ARENA_SIZE - 1][ARENA_SIZE - 1], this.x, this.y);
+        Stack<aNode> returnObj = createStack(aNodeSet[ARENA_SIZE - 1][ARENA_SIZE - 1], this.x, this.y);
+/*        if (returnObj == null) {
+            System.out.println("isMonster? ");
+            for (int i = 0; i < ARENA_SIZE; ++i) {
+                for (int j = 0; j < ARENA_SIZE; ++j)
+                    System.out.print(aNodeSet[i][j].isMonster);
+                System.out.println();
+            }
+
+        }*/
+        return returnObj;
     }
 
     public aNode initializeStart(aNode start) {
