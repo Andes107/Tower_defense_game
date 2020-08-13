@@ -52,7 +52,6 @@ public class Monster {
         int monsterNewRandom = new Random().nextInt(mapWithoutMonster.size());
         mapObject monsterNewTempObj = mapWithoutMonster.remove(monsterNewRandom);
         monsterNewTempObj.monster = (monsterNewType == 0? new Penguin(monsterNewTempObj.x, monsterNewTempObj.y, monsterNewCounter, monsterNewHealth): (monsterNewType == 1? new Unicorn(monsterNewTempObj.x, monsterNewTempObj.y, monsterNewCounter, monsterNewHealth * monsterNewHealthScalar): new Fox(monsterNewTempObj.x, monsterNewTempObj.y, monsterNewCounter / monsterNewCounterScalar, monsterNewHealth)));
-        System.out.println("(map[monsterNewTempObj.x][monsterNewTempObj.y].monster == monsterNewTempObj.monster)" + (map[monsterNewTempObj.x][monsterNewTempObj.y].monster == monsterNewTempObj.monster));
         monsterNewTempObj.monster.next = monsterNewTempObj.monster.nextAlgorithm(map, monsterNewTempObj.monster instanceof Fox);
         return monsterNewTempObj.monster;
     }

@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -179,7 +180,8 @@ public class gameController {
         Tower.towerDamageBack(imageToTowerMap.values(), map);
         towerDel();
         towerNew();
-        monsterNextMove();
+        if (monsterNextMove() == true)
+            Platform.exit();
         monsterNewRanGen();
         /*
         * towerUp(); Remark: Stuck in UI design, will come back later after some concrete work is done here.
@@ -217,28 +219,39 @@ public class gameController {
         towerDelFrontImgView = null;
     }
 
-    public void monsterNextMove() {
-        Set<Monster> itrSet = monsterToImageMap.keySet();
-        Iterator<Monster> itr = monsterToImageMap.keySet().iterator();
-        for (Monster monster : itrSet) {
-            if (monster.health <= 0) {
-                leftAnchorPane.getChildren().remove(monsterToImageMap.get(monster));
-                System.out.println(monsterToImageMap.remove(monster).getX());
-                map[monster.x][monster.y].monster = null;
-                mapWithoutMonster.add(map[monster.x][monster.y]);
+    public boolean monsterNextMove() {
+        Iterator<Monster> monsterNextItr = monsterToImageMap.keySet().iterator();
+        while (monsterNextItr.hasNext()) {
+            Monster monsterNextCurr = monsterNextItr.next();
+            /*
+            * Three cases for a monster
+            * 1. It reached destination
+            * 2. It dies
+            * 3. Not any of the above
+            * */
+            if (monsterNextCurr.x == (ARENA_SIZE - 1) && monsterNextCurr.y == (ARENA_SIZE - 1))
+                return true;
+            if (monsterNextCurr.health <= 0) {
+                leftAnchorPane.getChildren().remove(monsterToImageMap.get(monsterNextCurr));
+                map[monsterNextCurr.x][monsterNextCurr.y].monster = null;
+                mapWithoutMonster.add(map[monsterNextCurr.x][monsterNextCurr.y]);
+                monsterNextItr.remove();
                 continue;
             }
-            if ((monster.counter--) == 0) {
-                aNode nextMove = monster.next.pop();
-                map[monster.x][monster.y].monster = null;
-                mapWithoutMonster.add(map[monster.x][monster.y]);
-                mapWithoutMonster.remove(map[nextMove.x][nextMove.y]);
-                monster.x = nextMove.x;
-                monster.y = nextMove.y;
-                monster.simpleX.set(monster.x);
-                monster.simpleY.set(monster.y);
+            if (monsterNextCurr.next.isEmpty() == false && map[monsterNextCurr.next.peek().x][monsterNextCurr.next.peek().y].monster == null && (monsterNextCurr.counter--) == 0) {
+                monsterNextCurr.counter = monsterNextCurr.maxCounter;
+                mapWithoutMonster.remove(map[monsterNextCurr.x][monsterNextCurr.y]);
+                map[monsterNextCurr.x][monsterNextCurr.y].monster = null;
+                aNode monsterNextStep = monsterNextCurr.next.pop();
+                monsterNextCurr.x = monsterNextStep.x;
+                monsterNextCurr.y = monsterNextStep.y;
+                monsterNextCurr.simpleX.set(monsterNextCurr.x);
+                monsterNextCurr.simpleY.set(monsterNextCurr.y);
+                map[monsterNextCurr.x][monsterNextCurr.y].monster = monsterNextCurr;
+                mapWithoutMonster.add(map[monsterNextCurr.x][monsterNextCurr.y]);
             }
         }
+        return false;
     }
 
     /*
