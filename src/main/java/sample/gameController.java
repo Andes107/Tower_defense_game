@@ -195,9 +195,12 @@ public class gameController {
         towerDel();
         towerNew();
         if (monsterNextMove() == true) {
-            System.out.println("It should be done here!!!");
             timeline.stop();
             Next.setDisable(true);
+            basicTower.setDisable(true);
+            iceTower.setDisable(true);
+            deathStar.setDisable(true);
+            catapult.setDisable(true);
             return;
         }
         monsterNewRanGen();
@@ -248,8 +251,6 @@ public class gameController {
             * 3. Not any of the above
             * */
             if (monsterNextCurr.x == (ARENA_SIZE - 1) && monsterNextCurr.y == (ARENA_SIZE - 1)) {
-                System.out.println("Someone reached the target");
-                debug = true;
                 return true;
             }
             if (monsterNextCurr.health <= 0) {
